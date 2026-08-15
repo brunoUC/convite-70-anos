@@ -1,0 +1,789 @@
+/*
+ * Visual da festa: noite, neon, bola de espelhos.
+ *
+ * Mobile primeiro. O convite chega por WhatsApp e é aberto no celular, em pé,
+ * quase sempre antes de qualquer um sentar num computador.
+ */
+
+:root {
+  --noite: #0b0614;
+  --noite-2: #150b26;
+  --tinta: #f7f2ff;
+  --suave: #b9a9d4;
+  --ouro: #ffd166;
+  --rosa: #ff5d8f;
+  --menta: #06d6a0;
+  --linha: #2e2044;
+  --erro: #ff8fa3;
+}
+
+body {
+  margin: 0;
+  background: var(--noite);
+  color: var(--tinta);
+  font:
+    400 16px/1.55 var(--font-festa), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Canvas do show ────────────────────────────────── */
+
+.show-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Cortina ───────────────────────────────────────── */
+
+.festa-root {
+  position: relative;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--noite-2) 0%, var(--noite) 62%);
+}
+
+.curtain {
+  display: grid;
+  place-items: center;
+}
+
+.curtain-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 32px 24px 56px;
+}
+
+.curtain-kicker,
+.festa-kicker {
+  margin: 0 0 18px;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+
+.curtain-70 {
+  margin: 0;
+  font-family: var(--font-display), cursive;
+  font-size: clamp(120px, 42vw, 260px);
+  line-height: 0.9;
+  color: var(--ouro);
+  /* Neon: três halos e nenhuma imagem. */
+  text-shadow:
+    0 0 8px rgba(255, 209, 102, 0.9),
+    0 0 34px rgba(255, 93, 143, 0.65),
+    0 0 80px rgba(255, 93, 143, 0.4);
+  animation: pisca 4.5s ease-in-out infinite;
+}
+
+@keyframes pisca {
+  0%, 92%, 100% { opacity: 1; }
+  94% { opacity: 0.72; }
+  96% { opacity: 1; }
+  98% { opacity: 0.85; }
+}
+
+.curtain-names {
+  margin: 8px 0 34px;
+  font-size: clamp(20px, 6vw, 32px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.curtain-btn,
+.festa-submit {
+  display: inline-block;
+  font: 700 15px/1 var(--font-festa), sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 18px 34px;
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(100deg, var(--ouro), var(--rosa));
+  color: #1a0d0d;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(255, 93, 143, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.curtain-btn:hover,
+.festa-submit:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 46px rgba(255, 93, 143, 0.6);
+}
+
+.curtain-btn:active { transform: translateY(0) scale(0.99); }
+
+.curtain-warn {
+  margin: 20px 0 0;
+  font-size: 12.5px;
+  color: var(--suave);
+  letter-spacing: 0.06em;
+}
+
+/* ── Convite ───────────────────────────────────────── */
+
+.festa-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 56px 20px 96px;
+  animation: entra 0.9s 0.15s both ease-out;
+}
+
+/*
+ * Véu entre o show e o texto.
+ *
+ * A sombra no texto dá conta de um estouro passando; não dá conta dos shows
+ * de chuva contínua — purpurina e confete cobrem a tela inteira e apagaram o
+ * parágrafo de abertura no teste. O véu é um degradê radial: escuro no miolo,
+ * onde mora o texto, e transparente nas bordas, onde os fogos continuam
+ * aparecendo. Cobrir a tela toda de preto resolveria a leitura matando o
+ * show, que é justamente o que o convite tem de melhor.
+ */
+.festa-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -30px -30px 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* Faixa do rodapé: o degradê radial já acabou lá embaixo, e o carimbo
+       da data sumia dentro das barras claras do "Estrobo do Studio 54". */
+    linear-gradient(to top, rgba(11, 6, 20, 0.88) 0%, rgba(11, 6, 20, 0) 24%),
+    radial-gradient(
+      72% 52% at 50% 44%,
+      rgba(11, 6, 20, 0.9) 0%,
+      rgba(11, 6, 20, 0.76) 48%,
+      rgba(11, 6, 20, 0) 100%
+    );
+}
+
+@keyframes entra {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+.festa-hero { text-align: center; }
+
+/*
+ * Texto do herói fica direto sobre o canvas, sem cartão atrás. Um estouro
+ * claro passando por baixo apagava a linha inteira — visto em teste, com
+ * "seu show é…" ilegível durante o salgueiro dourado.
+ *
+ * A saída é sombra escura no texto, e não um painel opaco: painel resolveria
+ * a leitura escondendo os fogos justo na faixa central do celular, que é
+ * onde o show acontece.
+ */
+.festa-kicker,
+.festa-math,
+.festa-lead,
+.festa-show,
+.festa-anos,
+.festa-foot {
+  text-shadow:
+    0 0 6px var(--noite),
+    0 2px 14px var(--noite),
+    0 0 30px var(--noite);
+}
+
+.festa-title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.festa-age {
+  font-family: var(--font-display), cursive;
+  font-size: clamp(96px, 30vw, 180px);
+  line-height: 0.9;
+  color: var(--ouro);
+  text-shadow:
+    0 0 8px rgba(255, 209, 102, 0.85),
+    0 0 40px rgba(255, 93, 143, 0.55);
+}
+
+.festa-anos {
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--suave);
+  padding-left: 0.5em;
+}
+
+.festa-math {
+  margin: 18px 0 0;
+  font-size: clamp(17px, 5vw, 22px);
+  font-weight: 700;
+}
+
+.festa-plus { color: var(--rosa); }
+
+.festa-lead {
+  margin: 14px auto 0;
+  max-width: 44ch;
+  color: var(--suave);
+  font-size: 15px;
+}
+
+.festa-facts {
+  margin: 30px 0 0;
+  display: grid;
+  gap: 1px;
+  background: var(--linha);
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.festa-facts > div {
+  background: rgba(11, 6, 20, 0.72);
+  padding: 14px 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.festa-facts dt {
+  flex: none;
+  width: 72px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+
+.festa-facts dd {
+  margin: 0;
+  font-size: 15px;
+}
+
+.festa-facts strong { color: var(--ouro); }
+
+.festa-show {
+  margin: 20px 0 0;
+  font-size: 13px;
+  color: var(--suave);
+}
+
+.festa-show strong { color: var(--menta); }
+
+/* ── Formulário ────────────────────────────────────── */
+
+.festa-card {
+  margin-top: 34px;
+  padding: 24px 20px 26px;
+  border: 1px solid var(--linha);
+  border-radius: 16px;
+  background: rgba(21, 11, 38, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.festa-card h2 {
+  margin: 0 0 20px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+
+.festa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.festa-field label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+
+.festa-field input,
+.festa-field textarea,
+.painel input,
+.painel textarea,
+.painel-gate input {
+  font: 400 16px/1.4 var(--font-festa), sans-serif; /* 16px evita o zoom do iOS */
+  padding: 13px 14px;
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  background: rgba(11, 6, 20, 0.85);
+  color: var(--tinta);
+  resize: vertical;
+}
+
+.festa-field input:focus,
+.festa-field textarea:focus {
+  outline: 2px solid var(--ouro);
+  outline-offset: -2px;
+}
+
+.festa-field input[aria-invalid="true"] { border-color: var(--erro); }
+
+.festa-err {
+  font-size: 12.5px;
+  color: var(--erro);
+}
+
+.festa-hint {
+  font-size: 11.5px;
+  color: var(--suave);
+  align-self: flex-end;
+}
+
+.festa-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.choice {
+  font: 700 15px/1 var(--font-festa), sans-serif;
+  padding: 18px 10px;
+  min-height: 56px;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  background: rgba(11, 6, 20, 0.7);
+  color: var(--tinta);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.choice:hover { border-color: var(--suave); }
+
+.choice.yes.on {
+  background: linear-gradient(100deg, var(--ouro), var(--rosa));
+  color: #1a0d0d;
+  border-color: transparent;
+  box-shadow: 0 0 26px rgba(255, 93, 143, 0.4);
+}
+
+.choice.no.on {
+  background: rgba(185, 169, 212, 0.16);
+  border-color: var(--suave);
+}
+
+.festa-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.festa-check input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--rosa);
+  flex: none;
+}
+
+.festa-stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.festa-stepper button {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  line-height: 1;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  background: rgba(11, 6, 20, 0.85);
+  color: var(--tinta);
+  cursor: pointer;
+}
+
+.festa-stepper button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.festa-stepper output {
+  min-width: 52px;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.festa-submit { width: 100%; margin-top: 6px; }
+.festa-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.festa-banner {
+  margin: 0 0 14px;
+  padding: 11px 13px;
+  border: 1px solid var(--erro);
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: var(--erro);
+}
+
+.festa-done h2 {
+  font-family: var(--font-display), cursive;
+  font-size: 26px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ouro);
+  margin-bottom: 12px;
+}
+
+.festa-done p { margin: 0 0 18px; }
+
+.ghost-btn {
+  font: 500 13px/1 var(--font-festa), sans-serif;
+  padding: 11px 16px;
+  min-height: 42px;
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--suave);
+  cursor: pointer;
+}
+
+.festa-foot {
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid var(--linha);
+  text-align: center;
+  font-size: 13px;
+  color: var(--suave);
+}
+
+.festa-foot strong { color: var(--ouro); }
+
+.festa-stamp {
+  margin: 8px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* ── Música ────────────────────────────────────────── */
+
+.music {
+  position: fixed;
+  z-index: 3;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+}
+
+/* O player existe pelo áudio; o vídeo não interessa e não pode roubar
+   espaço nem foco. Fora da viewport em vez de display:none, que impediria
+   o autoplay em parte dos navegadores. */
+.music-host {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  left: -9999px;
+  top: 0;
+  overflow: hidden;
+}
+
+.music-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  font: 500 12.5px/1 var(--font-festa), sans-serif;
+  text-decoration: none;
+  padding: 11px 16px;
+  min-height: 40px;
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+  background: rgba(11, 6, 20, 0.9);
+  color: var(--suave);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.music-btn:hover { color: var(--tinta); border-color: var(--suave); }
+
+.music-song {
+  color: var(--ouro);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Painel ────────────────────────────────────────── */
+
+.painel-gate {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--noite);
+}
+
+.painel-gate form {
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.painel-gate h1 {
+  margin: 0;
+  font-family: var(--font-display), cursive;
+  font-size: 30px;
+  color: var(--ouro);
+}
+
+.painel-gate p { margin: 0 0 8px; color: var(--suave); font-size: 13px; }
+
+.painel-gate button,
+.painel button {
+  font: 600 13px/1 var(--font-festa), sans-serif;
+  letter-spacing: 0.06em;
+  padding: 13px 18px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ouro);
+  color: #1a0d0d;
+  cursor: pointer;
+}
+
+.painel button.ghost {
+  background: transparent;
+  border: 1px solid var(--linha);
+  color: var(--suave);
+}
+
+.painel button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.painel {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 18px 80px;
+  min-height: 100dvh;
+}
+
+.painel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.painel-head h1 {
+  margin: 0;
+  font-family: var(--font-display), cursive;
+  font-size: 26px;
+  color: var(--ouro);
+}
+
+.painel-head > div { flex: 1; }
+
+.painel-sub { margin: 6px 0 0; font-size: 12.5px; color: var(--suave); }
+
+.painel-totais {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 20px 0 28px;
+}
+
+.total {
+  padding: 14px 10px;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.total strong {
+  display: block;
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.total span {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+
+.total.destaque {
+  grid-column: 1 / -1;
+  background: linear-gradient(100deg, rgba(255, 209, 102, 0.14), rgba(255, 93, 143, 0.14));
+  border-color: var(--ouro);
+}
+
+.total.destaque strong { font-size: 40px; color: var(--ouro); }
+.total.ok strong { color: var(--menta); }
+.total.nao strong { color: var(--erro); }
+.total.pend strong { color: var(--suave); }
+
+.painel-add {
+  padding: 18px;
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  margin-bottom: 24px;
+}
+
+.painel-add h2 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+
+.painel-hint { margin: 0 0 12px; font-size: 12.5px; color: var(--suave); }
+
+.painel-acoes { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.painel-aviso { margin: 12px 0 0; font-size: 13px; color: var(--ouro); }
+
+.painel pre {
+  padding: 12px;
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 13px;
+  color: var(--menta);
+}
+
+.painel-filtros { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.chip {
+  font: 500 12px/1 var(--font-festa), sans-serif !important;
+  padding: 9px 13px !important;
+  min-height: 36px !important;
+  border: 1px solid var(--linha) !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--suave) !important;
+  cursor: pointer;
+}
+
+.chip.on {
+  background: var(--ouro) !important;
+  color: #1a0d0d !important;
+  border-color: var(--ouro) !important;
+}
+
+.painel-vazio {
+  padding: 30px 0;
+  text-align: center;
+  color: var(--suave);
+  font-size: 14px;
+}
+
+.painel-lista { list-style: none; margin: 0; padding: 0; }
+
+.convidado {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+.convidado-topo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.selo {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  flex: none;
+}
+
+.selo.yes { color: var(--menta); }
+.selo.no { color: var(--erro); }
+.selo.pending { color: var(--suave); }
+
+.convidado-nome { font-size: 16px; }
+
+.tagzinha {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ouro);
+  border: 1px solid var(--ouro);
+  border-radius: 999px;
+  padding: 3px 7px;
+}
+
+.convidado-detalhe {
+  margin: 7px 0 0;
+  font-size: 12.5px;
+  color: var(--suave);
+}
+
+.convidado-recado {
+  margin: 10px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--rosa);
+  font-size: 13.5px;
+  font-style: italic;
+}
+
+.convidado-acoes { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+
+.mini {
+  font: 500 11.5px/1 var(--font-festa), sans-serif !important;
+  padding: 8px 11px !important;
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--linha) !important;
+  background: transparent !important;
+  color: var(--suave) !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.mini:hover { color: var(--tinta) !important; border-color: var(--suave) !important; }
+.mini.perigo { color: var(--erro) !important; border-color: rgba(255, 143, 163, 0.4) !important; }
+
+@media (min-width: 620px) {
+  .painel-totais { grid-template-columns: repeat(5, 1fr); }
+  .total.destaque { grid-column: span 1; }
+  .total.destaque strong { font-size: 26px; }
+}
+
+/* Quem pediu menos movimento recebe menos movimento: o canvas já reduz
+   sozinho, aqui somem as animações de entrada e o neon pulsante. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
