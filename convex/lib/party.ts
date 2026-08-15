@@ -1,9 +1,9 @@
 /*
  * Dados e regras da festa, compartilhados entre o Convex e o navegador.
  *
- * Mesmo arranjo de `lib/validation.ts`: a UI usa para dar retorno enquanto se
- * digita e a mutation usa para recusar gravação. Módulo puro — sem API de
- * Node e sem API de navegador — porque roda nos dois lados.
+ * A UI usa para dar retorno enquanto se digita e a mutation usa para recusar
+ * a gravação. Módulo puro — sem API de Node e sem API de navegador — porque
+ * roda nos dois lados.
  */
 
 // ── A festa ────────────────────────────────────────────
@@ -223,7 +223,7 @@ const SLUG_ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789"; // sem l, o, 0, 1
  *
  * O nome no slug é conveniência para os anfitriões conferirem a lista de links.
  * O sufixo é o que impede adivinhar o link de outra pessoa a partir do nome —
- * sem ele, quem recebesse `/festa/c/maria-silva` responderia pelo vizinho.
+ * sem ele, quem recebesse `/c/maria-silva` responderia pelo vizinho.
  */
 export function makeSlug(name: string, random: () => number = Math.random): string {
   const base =

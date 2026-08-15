@@ -38,8 +38,8 @@ type Guest = {
 /**
  * O convite inteiro, usado pelas duas portas de entrada:
  *
- * - `/festa/c/<slug>`: link pessoal, já sabe quem é e qual o show dela;
- * - `/festa`: link aberto, a pessoa se apresenta e o show sai do nome.
+ * - `/c/<slug>`: link pessoal, já sabe quem é e qual o show dela;
+ * - `/`: link aberto, a pessoa se apresenta e o show sai do nome.
  *
  * A cortina existe por imposição do navegador, não por gosto: som só toca
  * depois de um gesto do usuário. Como o clique é obrigatório de qualquer

@@ -10,7 +10,7 @@ const url = process.env.NEXT_PUBLIC_CONVEX_URL;
 if (!url) {
   throw new Error(
     "NEXT_PUBLIC_CONVEX_URL não definida. Configure-a no projeto da Vercel " +
-      "(e em ui/.env.local para rodar localmente).",
+      "(e em .env.local para rodar localmente).",
   );
 }
 
