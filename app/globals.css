@@ -322,8 +322,7 @@ body {
 .festa-field input,
 .festa-field textarea,
 .painel input,
-.painel textarea,
-.painel-gate input {
+.painel textarea {
   font: 400 16px/1.4 var(--font-festa), sans-serif; /* 16px evita o zoom do iOS */
   padding: 13px 14px;
   min-height: 48px;
@@ -534,33 +533,6 @@ body {
 
 /* ── Painel ────────────────────────────────────────── */
 
-.painel-gate {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--noite);
-}
-
-.painel-gate form {
-  width: 100%;
-  max-width: 320px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.painel-gate h1 {
-  margin: 0;
-  font-family: var(--font-display), cursive;
-  font-size: 30px;
-  color: var(--ouro);
-}
-
-.painel-gate p { margin: 0 0 8px; color: var(--suave); font-size: 13px; }
-
-.painel-gate button,
 .painel button {
   font: 600 13px/1 var(--font-festa), sans-serif;
   letter-spacing: 0.06em;

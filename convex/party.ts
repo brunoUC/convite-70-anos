@@ -11,53 +11,23 @@ import {
 } from "./lib/party";
 
 /**
- * Backend do convite. Duas superfícies bem diferentes:
+ * Backend do convite.
  *
- * - pública, alcançada pelo link do convite: só enxerga um convidado por vez;
- * - dos anfitriões, protegida por senha: enxerga a lista inteira.
+ * ATENÇÃO — NÃO HÁ CONTROLE DE ACESSO AQUI. Foi decisão consciente: o painel
+ * dos anfitriões é apenas um endereço pouco óbvio, `/festaadmin`, sem senha.
  *
- * A senha vive em `PARTY_ADMIN_PASSWORD`, variável de ambiente do Convex.
- * Checar no servidor e não no navegador é o que faz diferença: uma senha
- * conferida no cliente estaria no bundle, legível por qualquer convidado.
+ * O que isso significa na prática, para quem for mexer nisso depois: as
+ * funções abaixo são públicas no deployment do Convex, e a URL do deployment
+ * viaja no bundle do navegador (`NEXT_PUBLIC_CONVEX_URL`). Qualquer pessoa com
+ * o link do convite consegue chamar `list` pelo console e ler a lista inteira
+ * — nomes, recados e quem recusou —, e consegue chamar `removeGuest` para
+ * apagar convidado. O endereço secreto esconde o painel, não os dados.
+ *
+ * Trate isto como uma lista de festa, que é o que é. Se um dia guardar aqui
+ * qualquer coisa que não possa vazar, o controle de acesso precisa voltar.
  */
 
 const statusValidator = v.union(v.literal("yes"), v.literal("no"));
-
-// ── Senha dos anfitriões ───────────────────────────────
-
-type Auth = "ok" | "denied" | "unconfigured";
-
-function authenticate(password: string): Auth {
-  const expected = process.env.PARTY_ADMIN_PASSWORD;
-  if (!expected) return "unconfigured";
-
-  // Comparação de tempo constante, igual à de http.ts: um early-return na
-  // primeira letra diferente entregaria a senha caractere por caractere.
-  // O tamanho vaza — é o preço de comparar sem hash, e o que ele entrega é
-  // "quantas letras tem", não as letras.
-  if (password.length !== expected.length) return "denied";
-  let diff = 0;
-  for (let i = 0; i < password.length; i++) {
-    diff |= password.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0 ? "ok" : "denied";
-}
-
-/**
- * Para as mutations, onde lançar é o certo: o erro chega no `catch` de quem
- * clicou. Em query seria diferente — exceção em `useQuery` sobe para o error
- * boundary e derruba a página inteira, então `list` devolve o estado.
- */
-function checkPassword(password: string): void {
-  const auth = authenticate(password);
-  if (auth === "unconfigured") {
-    throw new Error(
-      "PARTY_ADMIN_PASSWORD não configurada no Convex. " +
-        "Rode: npx convex env set PARTY_ADMIN_PASSWORD 'sua-senha'",
-    );
-  }
-  if (auth === "denied") throw new Error("senha incorreta");
-}
 
 // ── Leitura pública ────────────────────────────────────
 
@@ -216,19 +186,10 @@ async function uniqueSlug(ctx: { db: any }, name: string): Promise<string> {
 
 // ── Painel dos anfitriões ──────────────────────────────
 
-/**
- * Lista completa e totais. Exige a senha em toda chamada — não há sessão.
- *
- * Sem sessão porque a alternativa (token, cookie, tabela de sessões) é
- * infraestrutura de autenticação de verdade para proteger uma lista de
- * convidados de festa. A senha viaja no corpo da chamada, sobre TLS.
- */
+/** Lista completa e totais. Pública — ver o aviso no topo do arquivo. */
 export const list = query({
-  args: { password: v.string() },
-  handler: async (ctx, { password }) => {
-    const auth = authenticate(password);
-    if (auth !== "ok") return { state: auth, totals: null, guests: [] };
-
+  args: {},
+  handler: async (ctx) => {
     const guests = await ctx.db.query("partyGuests").collect();
     guests.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 
@@ -242,7 +203,6 @@ export const list = query({
     }
 
     return {
-      state: "ok" as const,
       totals,
       guests: guests.map((g) => ({
         id: g._id,
@@ -272,10 +232,8 @@ export const list = query({
  * lista com dois nomes novos no fim é exatamente como isso vai ser usado.
  */
 export const addGuests = mutation({
-  args: { password: v.string(), names: v.array(v.string()) },
-  handler: async (ctx, { password, names }) => {
-    checkPassword(password);
-
+  args: { names: v.array(v.string()) },
+  handler: async (ctx, { names }) => {
     const now = new Date().toISOString();
     let added = 0;
     let skipped = 0;
@@ -318,14 +276,11 @@ export const addGuests = mutation({
 /** Troca o nome ou a música de um convidado. Campo ausente = não mexe. */
 export const updateGuest = mutation({
   args: {
-    password: v.string(),
     id: v.id("partyGuests"),
     name: v.optional(v.string()),
     youtubeId: v.optional(v.string()),
   },
-  handler: async (ctx, { password, id, name, youtubeId }) => {
-    checkPassword(password);
-
+  handler: async (ctx, { id, name, youtubeId }) => {
     const patch: Record<string, unknown> = {};
     if (name !== undefined) {
       const clean = name.trim().replace(/\s+/g, " ");
@@ -356,9 +311,8 @@ function extractYoutubeId(input: string): string | null {
 
 /** Remove um convidado. Some da lista e o link dele deixa de abrir. */
 export const removeGuest = mutation({
-  args: { password: v.string(), id: v.id("partyGuests") },
-  handler: async (ctx, { password, id }) => {
-    checkPassword(password);
+  args: { id: v.id("partyGuests") },
+  handler: async (ctx, { id }) => {
     await ctx.db.delete(id);
     return { ok: true };
   },
@@ -371,9 +325,8 @@ export const removeGuest = mutation({
  * link aberto, seria apagar o convidado e recriá-lo com outro link.
  */
 export const resetGuest = mutation({
-  args: { password: v.string(), id: v.id("partyGuests") },
-  handler: async (ctx, { password, id }) => {
-    checkPassword(password);
+  args: { id: v.id("partyGuests") },
+  handler: async (ctx, { id }) => {
     await ctx.db.patch(id, {
       status: "pending",
       plusOne: false,

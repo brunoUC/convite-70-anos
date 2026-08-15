@@ -8,12 +8,12 @@ import { HOST_NAMES, PARTY, TOTAL_AGE, longDate } from "../../convex/lib/party";
 /*
  * Painel do Daniel e do Bruno: quem confirmou, quem recusou, quem sumiu.
  *
- * A senha fica no `sessionStorage` e não no `localStorage`: fechar a aba
- * esquece. É a diferença entre abrir a lista no computador de outra pessoa e
- * deixá-la aberta para sempre.
+ * Sem senha, por decisão do dono da festa: a proteção é só o endereço ser
+ * pouco óbvio. Vale saber o que isso protege — a página, e nada além dela.
+ * Os dados vêm do Convex, cujas funções são públicas e cuja URL está no
+ * bundle do convite, então quem quiser a lista não precisa achar este
+ * endereço. Ver o aviso no topo de `convex/party.ts`.
  */
-
-const KEY = "festa-senha";
 
 type Guest = {
   id: string;
@@ -35,33 +35,19 @@ type Guest = {
 type Filtro = "todos" | "yes" | "no" | "pending";
 
 export default function ListaPage() {
-  const [password, setPassword] = useState("");
-  const [tentativa, setTentativa] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("todos");
   const [novos, setNovos] = useState("");
   const [aviso, setAviso] = useState("");
   const [copiado, setCopiado] = useState<string | null>(null);
   const [origem, setOrigem] = useState("");
 
-  const data = useQuery(api.party.list, password ? { password } : "skip");
+  const data = useQuery(api.party.list, {});
   const addGuests = useMutation(api.party.addGuests);
   const removeGuest = useMutation(api.party.removeGuest);
   const resetGuest = useMutation(api.party.resetGuest);
 
-  useEffect(() => {
-    setPassword(sessionStorage.getItem(KEY) ?? "");
-    setOrigem(location.origin);
-  }, []);
-
-  // Senha errada não fica guardada: sem isso a tela de senha voltaria a cada
-  // carregamento sem nunca dizer que a senha salva é que está errada.
-  useEffect(() => {
-    if (data?.state === "denied") {
-      sessionStorage.removeItem(KEY);
-      setPassword("");
-      setAviso("senha incorreta");
-    }
-  }, [data?.state]);
+  // `location` só existe no navegador, e a página é pré-renderizada no build.
+  useEffect(() => setOrigem(location.origin), []);
 
   const guests = (data?.guests ?? []) as Guest[];
   const totals = data?.totals ?? null;
@@ -93,7 +79,7 @@ export default function ListaPage() {
       .filter(Boolean);
     if (names.length === 0) return;
     try {
-      const r = await addGuests({ password, names });
+      const r = await addGuests({ names });
       setNovos("");
       setAviso(
         `${r.added} ${r.added === 1 ? "convidado adicionado" : "convidados adicionados"}` +
@@ -134,51 +120,10 @@ export default function ListaPage() {
     URL.revokeObjectURL(a.href);
   }
 
-  // ── Porta ──
-  if (!password || data?.state === "denied") {
-    return (
-      <main className="painel-gate">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            sessionStorage.setItem(KEY, tentativa);
-            setPassword(tentativa);
-            setAviso("");
-          }}
-        >
-          <h1>lista da festa</h1>
-          <p>{TOTAL_AGE} anos · {HOST_NAMES}</p>
-          <input
-            type="password"
-            value={tentativa}
-            onChange={(e) => setTentativa(e.target.value)}
-            placeholder="senha"
-            autoFocus
-            autoComplete="current-password"
-          />
-          <button>entrar</button>
-          {aviso && <p className="painel-aviso">{aviso}</p>}
-        </form>
-      </main>
-    );
-  }
-
   if (data === undefined) {
     return (
       <main className="painel">
         <p className="painel-aviso">carregando…</p>
-      </main>
-    );
-  }
-
-  if (data.state === "unconfigured") {
-    return (
-      <main className="painel">
-        <h1>falta configurar a senha</h1>
-        <p className="painel-aviso">
-          A variável <code>PARTY_ADMIN_PASSWORD</code> não existe no Convex. No terminal:
-        </p>
-        <pre>npx convex env set PARTY_ADMIN_PASSWORD &apos;sua-senha&apos;</pre>
       </main>
     );
   }
@@ -192,15 +137,6 @@ export default function ListaPage() {
             {longDate(PARTY.date)} · {HOST_NAMES} · {TOTAL_AGE} anos
           </p>
         </div>
-        <button
-          className="ghost"
-          onClick={() => {
-            sessionStorage.removeItem(KEY);
-            setPassword("");
-          }}
-        >
-          sair
-        </button>
       </header>
 
       {totals && (
@@ -319,7 +255,7 @@ export default function ListaPage() {
                 {g.status !== "pending" && (
                   <button
                     className="mini"
-                    onClick={() => resetGuest({ password, id: g.id as any })}
+                    onClick={() => resetGuest({ id: g.id as any })}
                   >
                     limpar resposta
                   </button>
@@ -328,7 +264,7 @@ export default function ListaPage() {
                   className="mini perigo"
                   onClick={() => {
                     if (confirm(`Remover ${g.name}? O link dela para de funcionar.`)) {
-                      removeGuest({ password, id: g.id as any });
+                      removeGuest({ id: g.id as any });
                     }
                   }}
                 >

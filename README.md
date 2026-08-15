@@ -14,7 +14,7 @@ dos anos 70 e confirma presença ali mesmo.
 |---|---|---|
 | `/` | quem cai sem link pessoal | Convite; a pessoa digita o nome |
 | `/c/<slug>` | cada convidado | Convite pessoal, com show próprio |
-| `/lista` | Daniel e Bruno | Lista, totais, links e CSV — com senha |
+| `/festaadmin` | Daniel e Bruno | Lista, totais, links e CSV — sem senha |
 
 A abertura é uma cortina com "70" em neon e um botão. No clique estouram os
 fogos e começa a música; em seguida aparecem a data, a contagem regressiva e o
@@ -40,6 +40,13 @@ Convex é a fonte da verdade. A lista **nunca** entra no repositório — nem
 mesmo como exemplo — então o repositório ser público não expõe convidado
 nenhum.
 
+> **O painel não tem senha.** `/festaadmin` é apenas um endereço pouco óbvio.
+> Isso esconde a página, não os dados: as funções do Convex são públicas e a
+> URL do deployment está no bundle do convite, então qualquer convidado com o
+> link consegue ler a lista pelo console do navegador. Foi decisão consciente
+> para uma lista de festa. Se um dia guardar aqui algo que não possa vazar, o
+> controle de acesso precisa voltar — ver o aviso no topo de `convex/party.ts`.
+
 `convex/lib/party.ts` é módulo puro, sem API de Node nem de navegador, porque
 roda nos dois lados: a UI valida enquanto se digita e a mutation recusa a
 gravação com exatamente o mesmo código. Uma regra que valesse só no navegador
@@ -56,16 +63,10 @@ npm install
 npx convex dev          # cria o projeto e gera convex/_generated/
 ```
 
-Anote a URL do deployment (`https://SEU-DEPLOYMENT.convex.cloud`) e defina a
-senha do painel:
+Anote a URL do deployment (`https://SEU-DEPLOYMENT.convex.cloud`) — é o valor
+de `NEXT_PUBLIC_CONVEX_URL` no passo seguinte.
 
-```bash
-npx convex env set PARTY_ADMIN_PASSWORD 'a-senha-de-vocês'
-```
-
-Sem essa variável o painel diz exatamente isso e não abre. A senha é conferida
-**no servidor**, com comparação de tempo constante: no navegador ela estaria no
-bundle JavaScript, legível por qualquer convidado que abrisse o inspetor.
+Não há variável de senha a definir: o painel é aberto.
 
 ### 2. Vercel
 
@@ -79,7 +80,7 @@ Não há Root Directory a ajustar — o app está na raiz.
 
 ## Uso
 
-1. Entre em `/lista` e cole a lista de nomes, um por linha.
+1. Entre em `/festaadmin` e cole a lista de nomes, um por linha.
 2. Cada nome ganha um link `/c/<slug>`. Copie e mande por WhatsApp.
 3. As respostas aparecem na hora: o Convex é reativo, sem recarregar a página.
 4. `baixar CSV` exporta tudo com BOM, para o Excel em português não transformar
