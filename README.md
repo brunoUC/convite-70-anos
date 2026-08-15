@@ -153,8 +153,10 @@ anunciar partículas seria ruído. O convite inteiro é legível sem ele.
 
 Data, horário, local e nomes ficam no topo de `convex/lib/party.ts`.
 
-Horário e local estão **vazios** e simplesmente não aparecem no convite até
-serem preenchidos — melhor omitir do que anunciar "local: a definir".
+O **endereço** ainda está vazio, e por isso não aparece no convite: o campo só
+é renderizado quando tem conteúdo, então melhor omitir do que anunciar
+"local: a definir". Preencher `address` é o que falta para o convite ficar
+completo — hoje ele diz "Em casa · a partir das 19h", sem dizer qual casa.
 
 O total de 70 é **somado em código** a partir das idades, nunca escrito à mão:
 mudar uma idade sem mudar o título daria um convite que se contradiz.

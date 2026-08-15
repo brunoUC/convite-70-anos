@@ -16,9 +16,14 @@ export const PARTY = {
   ],
   /** Data da festa. Trocar aqui muda o convite, a contagem e o painel. */
   date: "2026-11-14",
-  /** Vazios não aparecem no convite — preencha quando fechar o local. */
-  time: "",
-  place: "",
+  /**
+   * A casa abre às 19h. "a partir das" e não "às" porque ninguém chega em
+   * ponto numa festa, e o convite não deve sugerir que quem chegar 20h
+   * perdeu alguma coisa.
+   */
+  time: "a partir das 19h",
+  place: "Em casa",
+  /** Ainda vazio: sem endereço, o convidado não sabe em qual casa. */
   address: "",
   /** Até quando dá para confirmar. Vazio = sem prazo declarado. */
   rsvpBy: "",
