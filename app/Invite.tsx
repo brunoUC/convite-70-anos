@@ -13,8 +13,8 @@ import {
   firstName,
   longDate,
   shortDate,
+  SHOWS,
   showAt,
-  showIndexFor,
   validateRsvp,
   type RsvpDraft,
 } from "../convex/lib/party";
@@ -66,14 +66,17 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
   const [touched, setTouched] = useState(false);
 
   /**
-   * O show. Com convite pessoal vem do documento; no link aberto sai do nome
-   * digitado, para a pessoa já ver "seu" show mudar enquanto escreve — e é o
-   * mesmo cálculo do servidor, então não troca depois de confirmar.
+   * O show é escolhido uma vez e não muda mais.
+   *
+   * Com convite pessoal vem do documento. No link aberto sorteamos na
+   * abertura — antes ele saía do nome digitado, e como o vídeo acompanha o
+   * show, a música recomeçava do zero a cada letra digitada no campo de nome.
    */
-  const show = useMemo(() => {
-    if (guest) return showAt(guest.showIndex);
-    return showAt(showIndexFor(name.trim() ? name.trim().toLowerCase() : "festa"));
-  }, [guest, name]);
+  const [sorteado] = useState(() => Math.floor(Math.random() * SHOWS.length));
+  const show = useMemo(
+    () => showAt(guest ? guest.showIndex : sorteado),
+    [guest, sorteado],
+  );
 
   const videoId = guest?.youtubeId || show.song.youtubeId;
   const dias = daysUntil(PARTY.date);
@@ -127,11 +130,29 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
     }
   }
 
+  /*
+   * Cortina e convite dividem a mesma <main>, e não duas árvores separadas.
+   * Dois `return` diferentes fariam o React desmontar tudo na abertura,
+   * inclusive o player — que perderia a música já engatilhada, que é
+   * justamente o que faz o som entrar junto com o clique.
+   */
+  const palco = (
+    <>
+      <Show effect={show.effect} palette={show.palette} running={open} />
+      <Music
+        videoId={videoId}
+        active={open}
+        title={show.song.title}
+        artist={show.song.artist}
+      />
+    </>
+  );
+
   // ── Cortina ──
   if (!open) {
     return (
       <main className="festa-root curtain">
-        <Show effect={show.effect} palette={show.palette} running={false} />
+        {palco}
         <div className="curtain-inner">
           {guest && (
             <p className="curtain-kicker">{firstName(guest.name)}, isto é para você</p>
@@ -168,8 +189,7 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
   // ── Convite aberto ──
   return (
     <main className="festa-root">
-      <Show effect={show.effect} palette={show.palette} running />
-      <Music videoId={videoId} playing title={show.song.title} artist={show.song.artist} />
+      {palco}
 
       <div className="festa-wrap">
         <header className="festa-hero">
@@ -246,7 +266,7 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
 
           <p className="festa-show">
             seu show é <strong>{show.label}</strong> — “{show.song.title}”,{" "}
-            {show.song.artist}, {show.song.year}
+            {show.song.artist}
           </p>
 
           <CheckerRule className="regua" />

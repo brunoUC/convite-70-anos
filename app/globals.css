@@ -539,6 +539,9 @@ body {
 
 /* ── Música ────────────────────────────────────────── */
 
+/* Na cortina o player já existe (tocando mudo), mas o controle não aparece. */
+.music-oculto { display: contents; }
+
 .music {
   position: fixed;
   z-index: 3;

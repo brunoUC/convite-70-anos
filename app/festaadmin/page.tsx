@@ -26,7 +26,7 @@ type Guest = {
   kidsNames: string;
   note: string;
   showLabel: string;
-  song: { title: string; artist: string; year: number; youtubeId: string };
+  song: { title: string; artist: string; youtubeId: string };
   youtubeId: string | null;
   source: "anfitriao" | "convidado";
   respondedAt: string | null;

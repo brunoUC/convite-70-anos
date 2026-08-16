@@ -46,7 +46,7 @@ export type Effect =
   | "confete"
   | "espiral"
   | "ondas"
-  | "chuva-de-ouro"
+  | "salgueiro"
   | "orbes"
   | "raios";
 
@@ -62,108 +62,106 @@ export type Show = {
     youtubeId: string;
     title: string;
     artist: string;
-    year: number;
   };
 };
 
 /**
  * Um show por convidado, escolhido pelo hash do slug.
  *
- * Só entram vídeos de canal oficial — VEVO, gravadora ou canal "- Topic",
- * que é upload automático da própria gravadora. Canal de fã some sem aviso e
- * o convite abriria com vídeo indisponível justamente na hora do "tchan".
+ * Rock brasileiro. Só entram vídeos de canal oficial — VEVO, gravadora, canal
+ * da própria banda ou canal "- Topic", que é upload automático da gravadora.
+ * Canal de fã some sem aviso e o convite abriria com vídeo indisponível
+ * justamente na hora do "tchan".
  * Se algum cair mesmo assim, o player mostra o fallback e a festa continua;
  * para trocar, edite `youtubeId` aqui ou o vídeo do convidado no painel.
  */
 export const SHOWS: Show[] = [
   {
-    id: "stayin-alive",
-    label: "Febre de Sábado à Noite",
+    id: "bom-brasileiro",
+    label: "Bom Brasileiro",
     effect: "fogos",
     palette: ["#1b40c6", "#4a6ede", "#0d2a8f"],
-    song: { youtubeId: "fNFzfwLM72c", title: "Stayin' Alive", artist: "Bee Gees", year: 1977 },
+    song: { youtubeId: "toLHh5MWQIc", title: "Bom Brasileiro", artist: "Cachorro Grande" },
   },
   {
-    id: "dancing-queen",
-    label: "Rainha da Pista",
-    effect: "purpurina",
-    palette: ["#4a6ede", "#1b40c6", "#8ea4ec"],
-    song: { youtubeId: "xFrGuyw1V8s", title: "Dancing Queen", artist: "ABBA", year: 1976 },
-  },
-  {
-    id: "september",
-    label: "Supernova de Setembro",
-    effect: "supernova",
-    palette: ["#1b40c6", "#0d2a8f", "#6b88e4"],
-    song: { youtubeId: "Gs069dndIYk", title: "September", artist: "Earth, Wind & Fire", year: 1978 },
-  },
-  {
-    id: "i-will-survive",
-    label: "Bola de Espelhos",
-    effect: "discoteca",
-    palette: ["#6b88e4", "#1b40c6", "#0d2a8f"],
-    song: { youtubeId: "6dYWe1c3OyU", title: "I Will Survive", artist: "Gloria Gaynor", year: 1978 },
-  },
-  {
-    id: "le-freak",
-    label: "Estrobo do Studio 54",
+    id: "que-loucura",
+    label: "Que Loucura",
     effect: "estrobo",
     palette: ["#1b40c6", "#8ea4ec", "#0d2a8f"],
-    song: { youtubeId: "aXgSHL7efKg", title: "Le Freak", artist: "CHIC", year: 1978 },
+    song: { youtubeId: "Sc4zAXr0kd0", title: "Que Loucura!", artist: "Cachorro Grande" },
   },
   {
-    id: "ymca",
-    label: "Chuva de Confete",
-    effect: "confete",
-    palette: ["#1b40c6", "#4a6ede", "#0d2a8f"],
-    song: { youtubeId: "CS9OO0S5w2k", title: "Y.M.C.A.", artist: "Village People", year: 1978 },
-  },
-  {
-    id: "dont-stop",
-    label: "Espiral Cintilante",
-    effect: "espiral",
-    palette: ["#4a6ede", "#0d2a8f", "#1b40c6"],
+    id: "um-minuto",
+    label: "Um Minuto",
+    effect: "supernova",
+    palette: ["#1b40c6", "#0d2a8f", "#6b88e4"],
     song: {
-      youtubeId: "yURRmWtbTbo",
-      title: "Don't Stop 'Til You Get Enough",
-      artist: "Michael Jackson",
-      year: 1979,
+      youtubeId: "x7UHl9Kf2CI",
+      title: "Um Minuto Para o Fim do Mundo",
+      artist: "CPM 22",
     },
   },
   {
-    id: "superstition",
-    label: "Groove em Ondas",
-    effect: "ondas",
-    palette: ["#1b40c6", "#6b88e4", "#0d2a8f"],
-    song: { youtubeId: "ftdZ363R9kQ", title: "Superstition", artist: "Stevie Wonder", year: 1972 },
-  },
-  {
-    id: "hot-stuff",
-    label: "Chuva de Ouro",
-    effect: "chuva-de-ouro",
-    palette: ["#0d2a8f", "#1b40c6", "#6b88e4"],
-    // O vídeo é a versão de 12 polegadas, mas o título fica sem essa nota:
-    // aparece entre aspas no convite e viraria aspas dentro de aspas.
-    song: { youtubeId: "tJxOXzE5A8w", title: "Hot Stuff", artist: "Donna Summer", year: 1979 },
-  },
-  {
-    id: "nao-quero-dinheiro",
-    label: "Só Quero Amar",
+    id: "sonifera-ilha",
+    label: "Sonífera",
     effect: "orbes",
     palette: ["#1b40c6", "#4a6ede", "#8ea4ec"],
+    song: { youtubeId: "_yL-mT4y9No", title: "Sonífera Ilha", artist: "Titãs" },
+  },
+  {
+    id: "mulher-de-fases",
+    label: "Fases",
+    effect: "confete",
+    palette: ["#1b40c6", "#4a6ede", "#0d2a8f"],
+    song: { youtubeId: "FkXWfreN2QA", title: "Mulher de Fases", artist: "Raimundos" },
+  },
+  {
+    id: "garota-nacional",
+    label: "Garota Nacional",
+    effect: "discoteca",
+    palette: ["#6b88e4", "#1b40c6", "#0d2a8f"],
+    song: { youtubeId: "DjPtwYunRq4", title: "Garota Nacional", artist: "Skank" },
+  },
+  {
+    id: "zoio-de-lula",
+    label: "Zóio de Lula",
+    effect: "ondas",
+    palette: ["#1b40c6", "#6b88e4", "#0d2a8f"],
+    song: { youtubeId: "Df_gGM1h9No", title: "Zóio de Lula", artist: "Charlie Brown Jr." },
+  },
+  {
+    id: "anna-julia",
+    label: "Anna Júlia",
+    effect: "purpurina",
+    palette: ["#4a6ede", "#1b40c6", "#8ea4ec"],
+    song: { youtubeId: "umMIcZODm2k", title: "Anna Júlia", artist: "Los Hermanos" },
+  },
+  {
+    // O efeito é o salgueiro, aquele fogo que desce devagar como chuva — daí
+    // o nome sair da própria música, em vez do apelido anterior.
+    id: "chove",
+    label: "Chove",
+    effect: "salgueiro",
+    palette: ["#0d2a8f", "#1b40c6", "#6b88e4"],
     song: {
-      youtubeId: "FM2tZnIPZUk",
-      title: "Não Quero Dinheiro (Só Quero Amar)",
-      artist: "Tim Maia",
-      year: 1971,
+      youtubeId: "qiU_XXucYBE",
+      title: "Primeiros Erros (Chove)",
+      artist: "Capital Inicial",
     },
   },
   {
-    id: "taj-mahal",
-    label: "Raios do Taj Mahal",
+    id: "oculos",
+    label: "Óculos",
     effect: "raios",
     palette: ["#0d2a8f", "#4a6ede", "#1b40c6"],
-    song: { youtubeId: "PaBkFpYYeGU", title: "Taj Mahal", artist: "Jorge Ben", year: 1972 },
+    song: { youtubeId: "IltVPNqYybw", title: "Óculos", artist: "Os Paralamas do Sucesso" },
+  },
+  {
+    id: "chip-novo",
+    label: "Chip Novo",
+    effect: "espiral",
+    palette: ["#4a6ede", "#0d2a8f", "#1b40c6"],
+    song: { youtubeId: "aXJ_Ub1xbhw", title: "Admirável Chip Novo", artist: "Pitty" },
   },
 ];
 

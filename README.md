@@ -16,13 +16,18 @@ dos anos 70 e confirma presença ali mesmo.
 | `/c/<slug>` | cada convidado | Convite pessoal, com show próprio |
 | `/festaadmin` | Daniel e Bruno | Lista, totais, links e CSV — sem senha |
 
-A abertura é uma cortina com "70" em neon e um botão. No clique estouram os
-fogos e começa a música; em seguida aparecem a data, a contagem regressiva e o
-formulário — nome, vou/não vou, acompanhante e um contador de crianças.
+A abertura reproduz o save-the-date impresso, com um botão. No clique estouram
+os fogos e entra a música; em seguida aparecem a data, a contagem regressiva e
+o formulário — nome, vou/não vou, acompanhante e um contador de crianças.
 
 **Por que existe um clique antes do estouro.** Navegador nenhum toca áudio sem
 gesto do usuário; autoplay com som é bloqueado desde 2018. Como o clique é
 inevitável, ele virou o momento do "tchan" em vez de um obstáculo.
+
+**Como o som entra instantâneo mesmo assim.** Autoplay *mudo* é liberado, então
+o player nasce junto com a página, mudo e já rodando, e o clique só chama
+`unMute()` — desmutar algo que já toca não passa por checagem de gesto nenhuma.
+Ver o comentário no topo de `app/Music.tsx`.
 
 ---
 
@@ -98,30 +103,34 @@ Silva" da lista.
 
 ## Os shows
 
-São 11 combinações de música + animação em `convex/lib/party.ts`, sorteadas
-pelo hash do slug. Todas incluem fogos de artifício; o que muda é a camada por
-cima:
+São 11 combinações de rock brasileiro + animação em `convex/lib/party.ts`,
+sorteadas pelo hash do slug. Todas incluem fogos de artifício; o que muda é a
+camada por cima:
 
 | Show | Música | Animação |
 |---|---|---|
-| Febre de Sábado à Noite | Stayin' Alive — Bee Gees | fogos |
-| Rainha da Pista | Dancing Queen — ABBA | purpurina |
-| Supernova de Setembro | September — Earth, Wind & Fire | supernova |
-| Bola de Espelhos | I Will Survive — Gloria Gaynor | feixes girando |
-| Estrobo do Studio 54 | Le Freak — CHIC | barras de luz |
-| Chuva de Confete | Y.M.C.A. — Village People | confete |
-| Espiral Cintilante | Don't Stop 'Til You Get Enough — Michael Jackson | espiral |
-| Groove em Ondas | Superstition — Stevie Wonder | ondas |
-| Chuva de Ouro | Hot Stuff — Donna Summer | salgueiro dourado |
-| Só Quero Amar | Não Quero Dinheiro — Tim Maia | orbes |
-| Raios do Taj Mahal | Taj Mahal — Jorge Ben | raios |
+| Bom Brasileiro | Bom Brasileiro — Cachorro Grande | fogos |
+| Que Loucura | Que Loucura! — Cachorro Grande | barras de luz |
+| Um Minuto | Um Minuto Para o Fim do Mundo — CPM 22 | supernova |
+| Sonífera | Sonífera Ilha — Titãs | orbes |
+| Fases | Mulher de Fases — Raimundos | confete |
+| Garota Nacional | Garota Nacional — Skank | feixes girando |
+| Zóio de Lula | Zóio de Lula — Charlie Brown Jr. | ondas |
+| Anna Júlia | Anna Júlia — Los Hermanos | purpurina |
+| Chove | Primeiros Erros (Chove) — Capital Inicial | salgueiro |
+| Óculos | Óculos — Os Paralamas do Sucesso | raios |
+| Chip Novo | Admirável Chip Novo — Pitty | espiral |
 
-Só entraram vídeos de **canal oficial** — VEVO, gravadora, ou canal `- Topic`,
-que é upload automático da própria gravadora — e cada ID foi conferido pela API
-de oEmbed do YouTube antes de entrar no código. Isso não é zelo excessivo: na
-primeira leva de candidatos, o "Le Freak" era o *Pump It* do Black Eyed Peas e
-dois outros eram upload de fã. Canal de fã sai do ar sem aviso, e o convite
-abriria com "vídeo indisponível" justamente na hora do estouro.
+Só entraram vídeos de **canal oficial** — VEVO, gravadora, canal da própria
+banda ou canal `- Topic`, que é upload automático da gravadora — e cada ID foi
+conferido pela API de oEmbed do YouTube antes de entrar no código. Isso não é
+zelo excessivo: em levas anteriores de candidatos apareceram um vídeo que era
+de outra banda inteiramente e vários uploads de fã. Canal de fã sai do ar sem
+aviso, e o convite abriria com "vídeo indisponível" justamente na hora do
+estouro.
+
+Não há ano de lançamento nos dados. Eu não tinha o ano conferido de cada faixa,
+e ano errado impresso no convite é pior que ano nenhum.
 
 Ainda assim não dá para garantir embed para sempre — o dono pode desativar
 depois. Por isso o player trata o erro: se o vídeo não tocar, aparece um botão

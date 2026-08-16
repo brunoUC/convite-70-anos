@@ -251,7 +251,7 @@ export function Show({
         if (p.life >= p.max || p.y > h + 60) {
           if (p.kind === "foguete") {
             // Chegou ao topo: é aqui que o foguete vira estouro.
-            if (eff === "chuva-de-ouro") willow(p.x, p.y);
+            if (eff === "salgueiro") willow(p.x, p.y);
             else burst(p.x, p.y, eff === "supernova" ? 90 : 62);
           }
           ps.splice(i, 1);
