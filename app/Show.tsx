@@ -6,6 +6,12 @@ import type { Effect } from "../convex/lib/party";
 /*
  * O show de abertura: um canvas em tela cheia atrás do convite.
  *
+ * Repintado para a marca do save-the-date: tinta azul sobre creme. Não foi só
+ * trocar cores. A versão anterior compunha as partículas somando luz, o que
+ * sobre fundo claro dá branco — elas simplesmente sumiriam. Agora tudo é
+ * desenhado como tinta opaca por cima, que é a linguagem de traço e respingo
+ * das ilustrações do convite.
+ *
  * Todo convidado ganha fogos de artifício — é o pedido, e é o que faz a
  * abertura ser estrondosa. Por cima vem a assinatura do show sorteado, que é
  * o que muda de pessoa para pessoa.
@@ -40,7 +46,7 @@ type P = {
 };
 
 const MAX_PARTICLES = 900;
-const BG = "#0b0614";
+const BG = "#f6f2e8";
 
 export function Show({
   effect,
@@ -209,7 +215,11 @@ export function Show({
       // Rastro: em vez de limpar, pinta o fundo semitransparente por cima.
       // É o que dá cauda às faíscas sem guardar posições antigas.
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = reduced ? BG : `${BG}2e`;
+      // Rastro curto de propósito. Sobre fundo escuro, a soma de luz mantinha
+      // a cauda brilhante; aqui cada quadro de creme por cima dessatura o
+      // azul, e um rastro longo transformava os fogos em poeira acinzentada.
+      // Apagando quase tudo a cada quadro, a partícula fica tinta viva.
+      ctx.fillStyle = reduced ? BG : `${BG}5a`;
       ctx.fillRect(0, 0, w, h);
 
       if (on && !reduced) {
@@ -219,8 +229,8 @@ export function Show({
         const t = frame / 90;
         const r = Math.min(w, h) * (0.32 + Math.sin(t) * 0.03);
         const g = ctx.createRadialGradient(w / 2, h * 0.42, 0, w / 2, h * 0.42, r);
-        g.addColorStop(0, `${paletteRef.current[0]}22`);
-        g.addColorStop(1, "#00000000");
+        g.addColorStop(0, `${paletteRef.current[0]}1c`);
+        g.addColorStop(1, "#f6f2e800");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
       }
@@ -249,11 +259,15 @@ export function Show({
         }
 
         const fade = 1 - p.life / p.max;
-        ctx.globalAlpha = Math.max(0, Math.min(1, fade * 1.4));
+        // Opaca quase até o fim, caindo rápido só no último terço.
+        // Sobre fundo escuro, meia opacidade ainda lia como brilho; sobre
+        // creme, azul a 50% vira cinza sujo e o fogo parece poeira.
+        ctx.globalAlpha = Math.max(0, Math.min(1, fade * 3));
         ctx.fillStyle = p.color;
         // Confete é papel, não brasa: somar luz deixava cada pedaço brilhando
         // e o rastro virava um borrão claro por cima do texto.
-        ctx.globalCompositeOperation = p.kind === "confete" ? "source-over" : "lighter";
+        // Sempre tinta opaca — ver a nota no topo do arquivo.
+        ctx.globalCompositeOperation = "source-over";
 
         if (p.kind === "confete") {
           ctx.save();
@@ -267,7 +281,7 @@ export function Show({
         } else if (p.kind === "orbe") {
           const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 6);
           g.addColorStop(0, p.color);
-          g.addColorStop(1, "#00000000");
+          g.addColorStop(1, "#f6f2e800");
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size * 6, 0, Math.PI * 2);
@@ -414,7 +428,7 @@ export function Show({
 
       if (eff === "discoteca") {
         // Feixes girando a partir da bola, no alto e ao centro.
-        ctx.globalCompositeOperation = "lighter";
+        ctx.globalCompositeOperation = "source-over";
         const cx = w / 2;
         const cy = h * 0.1;
         const t = f * 0.012;
@@ -425,7 +439,7 @@ export function Show({
           ctx.rotate(a);
           const g = ctx.createLinearGradient(0, 0, 0, h);
           g.addColorStop(0, `${i % 2 ? p0 : p1}44`);
-          g.addColorStop(1, "#00000000");
+          g.addColorStop(1, "#f6f2e800");
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.moveTo(0, 0);
@@ -441,7 +455,7 @@ export function Show({
         // ~1,7 Hz a 60 fps. Bem abaixo do limiar fotossensível de 3 Hz, e a
         // opacidade máxima é 0.10 — lavagem de cor, não flash.
         const phase = Math.sin(f * 0.18);
-        ctx.globalCompositeOperation = "lighter";
+        ctx.globalCompositeOperation = "source-over";
         ctx.fillStyle = phase > 0 ? p0 : p1;
         ctx.globalAlpha = Math.abs(phase) * 0.1;
         ctx.fillRect(0, 0, w, h);
@@ -451,16 +465,16 @@ export function Show({
         for (let i = 0; i < bars; i++) {
           const x = ((f * 2.2 + (i * w) / bars) % (w + 160)) - 80;
           const g = ctx.createLinearGradient(x, 0, x + 80, 0);
-          g.addColorStop(0, "#00000000");
+          g.addColorStop(0, "#f6f2e800");
           g.addColorStop(0.5, `${i % 2 ? p0 : p1}33`);
-          g.addColorStop(1, "#00000000");
+          g.addColorStop(1, "#f6f2e800");
           ctx.fillStyle = g;
           ctx.fillRect(x, 0, 80, h);
         }
       }
 
       if (eff === "raios") {
-        ctx.globalCompositeOperation = "lighter";
+        ctx.globalCompositeOperation = "source-over";
         const cx = w / 2;
         const cy = h * 0.42;
         const t = f * 0.008;
@@ -472,7 +486,7 @@ export function Show({
           ctx.rotate(a);
           const g = ctx.createLinearGradient(0, 0, Math.max(w, h), 0);
           g.addColorStop(0, `${p0}${Math.round(pulse * 60).toString(16).padStart(2, "0")}`);
-          g.addColorStop(1, "#00000000");
+          g.addColorStop(1, "#f6f2e800");
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.moveTo(0, 0);

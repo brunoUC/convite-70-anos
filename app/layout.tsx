@@ -1,39 +1,41 @@
 import type { Metadata, Viewport } from "next";
-import { Monoton, Space_Grotesk } from "next/font/google";
+import { Caveat, Poppins } from "next/font/google";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { HOST_NAMES, PARTY, TOTAL_AGE, longDate } from "../convex/lib/party";
 import "./globals.css";
 
 /*
- * Fontes auto-hospedadas pelo next/font: baixadas no build e servidas do
- * mesmo domínio, sem requisição a fonts.googleapis.com antes do primeiro
- * texto. Numa página cuja graça é abrir rápido e estourar, isso conta.
+ * As duas vozes tipográficas do save-the-date.
  *
- * Monoton é a fonte do "70" em neon — desenhada com traços vazados, ela já
- * é o letreiro; Space Grotesk carrega o resto.
+ * Caveat faz o letreiro manuscrito ("SAVE THE DATE", os nomes, a data).
+ * Poppins Light carrega o lockup "70 years", que no impresso é uma geométrica
+ * fina e larga, e também o texto corrido.
+ *
+ * Auto-hospedadas pelo next/font: baixadas no build e servidas do mesmo
+ * domínio, sem requisição a fonts.googleapis.com antes do primeiro texto.
  */
-const display = Monoton({
+const mao = Caveat({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-display",
+  weight: ["700"],
+  variable: "--font-mao",
   display: "swap",
 });
 
-const grotesk = Space_Grotesk({
+const corpo = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-festa",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-corpo",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: `${HOST_NAMES} · ${TOTAL_AGE} anos`,
-  description: `Festa de ${TOTAL_AGE} anos do ${HOST_NAMES} — ${longDate(PARTY.date)}. Confirme sua presença.`,
+  description: `Save the date — birthday party do ${HOST_NAMES}. ${longDate(PARTY.date)}. Confirme sua presença.`,
   // Sem indexação: o convite é para quem recebeu o link, não para quem
   // procurar o nome dos dois no Google.
   robots: { index: false, follow: false },
   openGraph: {
-    title: `${HOST_NAMES} · ${TOTAL_AGE} anos`,
+    title: `${HOST_NAMES} · ${TOTAL_AGE} years combined`,
     description: `${longDate(PARTY.date)}. Abra o convite — com som.`,
     type: "website",
   },
@@ -42,15 +44,15 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  colorScheme: "dark",
-  // Barra do navegador no tom da página: no celular, a faixa branca padrão
-  // cortava o topo da noite.
-  themeColor: "#0b0614",
+  colorScheme: "light",
+  // Barra do navegador no creme da marca: a faixa branca padrão cortava o
+  // topo da página no celular.
+  themeColor: "#f6f2e8",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${grotesk.variable}`}>
+    <html lang="pt-BR" className={`${mao.variable} ${corpo.variable}`}>
       <body>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>

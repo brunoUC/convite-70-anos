@@ -20,6 +20,7 @@ import {
 } from "../convex/lib/party";
 import { Show } from "./Show";
 import { Music } from "./Music";
+import { CheckerRule, Pour, Toast } from "./Art";
 
 type Guest = {
   slug: string;
@@ -132,17 +133,33 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
       <main className="festa-root curtain">
         <Show effect={show.effect} palette={show.palette} running={false} />
         <div className="curtain-inner">
-          <p className="curtain-kicker">
-            {guest ? `${firstName(guest.name)}, tem uma coisa para você` : "você está convidado"}
+          {guest && (
+            <p className="curtain-kicker">{firstName(guest.name)}, isto é para você</p>
+          )}
+
+          {/* A escada do cartaz impresso, na mesma ordem e no mesmo recuo. */}
+          <p className="std-1">Save the date</p>
+          <p className="std-2">Birthday party</p>
+          <p className="std-3">{PARTY.hosts.map((h) => h.name).join(" & ")}</p>
+
+          <p className="lockup">
+            <span className="lockup-num">{TOTAL_AGE}</span>
+            <span className="lockup-col">
+              <span className="lockup-word">years</span>
+              <span className="lockup-tag">Combined</span>
+            </span>
           </p>
-          <h1 className="curtain-70" aria-label={`${TOTAL_AGE} anos`}>
-            {TOTAL_AGE}
-          </h1>
-          <p className="curtain-names">{HOST_NAMES}</p>
-          <button className="curtain-btn" onClick={() => setOpen(true)}>
-            abrir o convite
-          </button>
-          <p className="curtain-warn">🔊 com som — aumente o volume</p>
+
+          <Toast className="curtain-art" />
+
+          <p className="curtain-date">{longDate(PARTY.date)}</p>
+
+          <p className="curtain-acao">
+            <button className="curtain-btn" onClick={() => setOpen(true)}>
+              abrir o convite
+            </button>
+          </p>
+          <p className="curtain-warn">♪ com som — aumente o volume</p>
         </div>
       </main>
     );
@@ -160,9 +177,12 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
             {guest ? `${firstName(guest.name)}, você está convidado para` : "você está convidado para"}
           </p>
 
-          <h1 className="festa-title">
-            <span className="festa-age">{TOTAL_AGE}</span>
-            <span className="festa-anos">anos</span>
+          <h1 className="lockup">
+            <span className="lockup-num">{TOTAL_AGE}</span>
+            <span className="lockup-col">
+              <span className="lockup-word">years</span>
+              <span className="lockup-tag">Combined</span>
+            </span>
           </h1>
 
           <p className="festa-math">
@@ -185,9 +205,18 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
               <dt>quando</dt>
               <dd>
                 <strong>{longDate(PARTY.date)}</strong>
-                {PARTY.time && <> · {PARTY.time}</>}
               </dd>
             </div>
+            {/* Linha própria: junto da data, o horário quebrava deixando o
+                "·" órfão no começo da segunda linha. */}
+            {PARTY.time && (
+              <div>
+                <dt>horário</dt>
+                <dd>
+                  <strong>{PARTY.time}</strong>
+                </dd>
+              </div>
+            )}
             {PARTY.place && (
               <div>
                 <dt>onde</dt>
@@ -213,10 +242,14 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
             </div>
           </dl>
 
+          <Toast className="festa-art" />
+
           <p className="festa-show">
             seu show é <strong>{show.label}</strong> — “{show.song.title}”,{" "}
             {show.song.artist}, {show.song.year}
           </p>
+
+          <CheckerRule className="regua" />
         </header>
 
         {sent ? (
@@ -362,6 +395,7 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
         )}
 
         <footer className="festa-foot">
+          <Pour className="foot-art" />
           {count && count.total > 0 && (
             <p>
               já somos <strong>{count.total}</strong> na pista
