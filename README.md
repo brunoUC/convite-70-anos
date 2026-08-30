@@ -91,6 +91,9 @@ Convex e trocar o build command por `npx convex deploy --cmd 'npm run build'`.
 
 ### Vercel
 
+No ar em **https://convite-70-anos.vercel.app**, com deploy automático a cada
+push na `main`.
+
 Import do repositório e pronto: **sem variáveis de ambiente, sem build command
 customizado, sem Root Directory**. Um clone limpo builda como está.
 
