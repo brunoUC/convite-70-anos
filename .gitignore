@@ -6,8 +6,12 @@ next-env.d.ts
 .env.local
 .env*.local
 
-# Gerado por `npx convex dev` a partir de schema.ts e das funções.
-# Fora do controle de versão de propósito: o conteúdo depende do deployment
-# configurado na máquina, e um arquivo desatualizado aqui causa erro de tipo
-# que parece bug de código.
-convex/_generated/
+# `convex/_generated/` FICA versionado — é o padrão que o Convex recomenda.
+#
+# Ele é gerado de schema.ts e das funções, não do deployment, então é o mesmo
+# em qualquer máquina. Versionar é o que deixa a Vercel buildar sabendo apenas
+# a NEXT_PUBLIC_CONVEX_URL: sem isso o build quebraria em "Cannot find module
+# convex/_generated/api", e a alternativa seria criar uma deploy key no painel
+# do Convex e mudar o build command.
+#
+# O preço: mexeu em convex/, rode `npx convex deploy` e recommite o que mudar.
