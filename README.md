@@ -61,25 +61,41 @@ não seria regra — bastaria uma chamada direta para furá-la.
 
 ## Instalação
 
-### 1. Convex
+Já está tudo provisionado. Esta seção existe para quem precisar refazer.
+
+### Convex
+
+O projeto é `convite-70-anos`, no time `bruno-toso`.
+
+| Ambiente | URL |
+|---|---|
+| produção | `https://trustworthy-pig-428.convex.cloud` |
+| dev | `https://trustworthy-gull-538.convex.cloud` |
+
+A URL de produção está fixada em `.env.production`, versionado. Ela é pública
+por definição — toda variável `NEXT_PUBLIC_*` é embutida no JavaScript que vai
+para o navegador —, então escondê-la não protegeria nada. O que protege os
+dados é o que está nas funções do Convex; ver o aviso no topo de
+`convex/party.ts`.
+
+Mexeu em `convex/`? Publique e recommite o que mudar:
 
 ```bash
-npm install
-npx convex dev          # cria o projeto e gera convex/_generated/
+npx convex deploy          # produção
+git add convex/_generated && git commit -m "..."
 ```
 
-Anote a URL do deployment (`https://SEU-DEPLOYMENT.convex.cloud`) — é o valor
-de `NEXT_PUBLIC_CONVEX_URL` no passo seguinte.
+O `convex/_generated/` **é versionado**, e é isso que permite à Vercel buildar
+sabendo apenas a URL. A alternativa seria criar uma deploy key no painel do
+Convex e trocar o build command por `npx convex deploy --cmd 'npm run build'`.
 
-Não há variável de senha a definir: o painel é aberto.
+### Vercel
 
-### 2. Vercel
+Import do repositório e pronto: **sem variáveis de ambiente, sem build command
+customizado, sem Root Directory**. Um clone limpo builda como está.
 
-Importe o repositório e configure a variável de ambiente:
-
-- `NEXT_PUBLIC_CONVEX_URL` = a URL `.convex.cloud`
-
-Não há Root Directory a ajustar — o app está na raiz.
+Se o site abrir pedindo login da Vercel, é a *Deployment Protection* da conta:
+Settings → Deployment Protection → Vercel Authentication → Disable.
 
 ---
 
