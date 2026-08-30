@@ -3,32 +3,31 @@ import { v } from "convex/values";
 
 export default defineSchema({
   /*
-   * Um documento por convidado, com a resposta embutida em vez de uma tabela
-   * separada de RSVPs. A festa tem uma casa de centenas de convidados e a
-   * pergunta é sempre "qual a resposta atual desta pessoa" — histórico de
-   * quem mudou de ideia não muda decisão nenhuma sobre bufê.
+   * Uma linha por pessoa que respondeu.
+   *
+   * Não há convidado pré-cadastrado: o link é o mesmo para todo mundo, então
+   * quem está aqui é exatamente quem respondeu. Some com isso o estado "sem
+   * resposta" — não dá para saber quem faltou quando não existe lista de
+   * quem foi convidado, e essa contagem não é necessária para a festa.
    */
   partyGuests: defineTable({
-    slug: v.string(), // trecho do link pessoal
     name: v.string(),
-    nameKey: v.string(), // normalizado, para casar nome digitado com cadastro
-    showIndex: v.number(), // música + animação
-    youtubeId: v.optional(v.string()), // sobrepõe a música do show
+    /** Normalizado: casa quem responde de novo com a linha que já existe. */
+    nameKey: v.string(),
 
-    status: v.union(v.literal("pending"), v.literal("yes"), v.literal("no")),
+    status: v.union(v.literal("yes"), v.literal("no")),
     plusOne: v.boolean(),
     plusOneName: v.optional(v.string()),
     kids: v.number(),
     kidsNames: v.optional(v.string()),
     note: v.optional(v.string()),
 
+    /** Qual show a pessoa pegou. Só curiosidade, exibida no painel. */
+    showId: v.optional(v.string()),
+
     createdAt: v.string(),
-    respondedAt: v.optional(v.string()),
-    // "anfitriao" = cadastrado no painel; "convidado" = se apresentou pelo
-    // link aberto. Separa quem foi convidado de quem apareceu.
-    source: v.union(v.literal("anfitriao"), v.literal("convidado")),
+    respondedAt: v.string(),
   })
-    .index("by_slug", ["slug"])
     .index("by_nameKey", ["nameKey"])
     .index("by_status", ["status"]),
 });

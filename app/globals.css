@@ -722,13 +722,79 @@ body {
   font-size: 14px;
 }
 
-.painel-lista { list-style: none; margin: 0; padding: 0; }
+/* ── Tabela de respostas ───────────────────────────── */
 
-.convidado { padding: 16px 0; border-bottom: 1px solid var(--linha); }
+.painel-barra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
 
-.convidado-topo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.painel-filtros { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+
+/*
+ * A tabela rola dentro da própria caixa em vez de espremer as colunas.
+ * Num convite aberto quase sempre no celular, sete colunas espremidas viram
+ * uma coluna de letra cortada; rolando, nome e status ficam legíveis e o
+ * resto vem com o arrasto.
+ */
+.tabela-rolagem {
+  overflow-x: auto;
+  border: 1.5px solid var(--linha);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.tabela th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--suave);
+  padding: 12px 14px;
+  border-bottom: 1.5px solid var(--linha);
+  background: var(--creme-2);
+  position: sticky;
+  top: 0;
+}
+
+.tabela td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--linha);
+  color: var(--tinta);
+  vertical-align: middle;
+}
+
+.tabela tbody tr:last-child td { border-bottom: 0; }
+.tabela tbody tr:hover td { background: rgba(27, 64, 198, 0.04); }
+
+/* Quem não vai fica de lado sem sumir: a linha inteira perde peso. */
+.tabela tr.no td { color: var(--suave); }
+
+.tabela .num { text-align: center; font-variant-numeric: tabular-nums; }
+.col-nome { font-weight: 600; color: var(--azul); }
+.col-fraca { color: var(--suave); font-size: 12.5px; }
+
+/* O recado é o único campo livre: deixa quebrar em vez de esticar a tabela. */
+.col-recado {
+  white-space: normal;
+  max-width: 260px;
+  min-width: 160px;
+  font-style: italic;
+}
 
 .selo {
+  display: inline-block;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -736,54 +802,24 @@ body {
   padding: 4px 9px;
   border-radius: 999px;
   border: 1.5px solid currentColor;
-  flex: none;
 }
 
 .selo.yes { color: var(--azul); background: rgba(27, 64, 198, 0.08); }
 .selo.no { color: var(--erro); }
-.selo.pending { color: var(--suave); }
-
-.convidado-nome { font-size: 16px; font-weight: 600; color: var(--tinta); }
-
-.tagzinha {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--azul);
-  border: 1.5px solid var(--azul);
-  border-radius: 999px;
-  padding: 3px 8px;
-}
-
-.convidado-detalhe { margin: 7px 0 0; font-size: 12.5px; color: var(--suave); }
-
-.convidado-recado {
-  margin: 10px 0 0;
-  padding-left: 12px;
-  border-left: 3px solid var(--azul-claro);
-  font-size: 13.5px;
-  font-style: italic;
-  color: var(--tinta);
-}
-
-.convidado-acoes { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
 
 .mini {
-  font: 500 11.5px/1 var(--font-corpo), sans-serif !important;
-  padding: 8px 12px !important;
-  min-height: 34px !important;
-  border-radius: 8px !important;
-  border: 1.5px solid var(--linha) !important;
-  background: transparent !important;
-  color: var(--suave) !important;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
+  font: 500 11.5px/1 var(--font-corpo), sans-serif;
+  padding: 7px 11px;
+  min-height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid var(--linha);
+  background: transparent;
+  color: var(--suave);
   cursor: pointer;
 }
 
-.mini:hover { color: var(--azul) !important; border-color: var(--azul) !important; }
-.mini.perigo { color: var(--erro) !important; border-color: rgba(179, 38, 30, 0.4) !important; }
+.mini:hover { color: var(--azul); border-color: var(--azul); }
+.mini.perigo:hover { color: var(--erro); border-color: var(--erro); }
 
 @media (min-width: 620px) {
   .painel-totais { grid-template-columns: repeat(5, 1fr); }

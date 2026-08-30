@@ -29,6 +29,9 @@ const corpo = Poppins({
 });
 
 export const metadata: Metadata = {
+  // Base absoluta para o card de compartilhamento: o WhatsApp não resolve
+  // caminho relativo, e sem isto a imagem não aparece na prévia do link.
+  metadataBase: new URL("https://convite-70-anos.vercel.app"),
   title: `${HOST_NAMES} · ${TOTAL_AGE} anos`,
   description: `Save the date — birthday party do ${HOST_NAMES}. ${longDate(PARTY.date)}. Confirme sua presença.`,
   // Sem indexação: o convite é para quem recebeu o link, não para quem

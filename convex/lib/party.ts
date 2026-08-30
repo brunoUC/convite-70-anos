@@ -16,23 +16,19 @@ export const PARTY = {
   ],
   /** Data da festa. Trocar aqui muda o convite, a contagem e o painel. */
   date: "2026-11-14",
-  /**
-   * A casa abre às 19h. "a partir das" e não "às" porque ninguém chega em
-   * ponto numa festa, e o convite não deve sugerir que quem chegar 20h
-   * perdeu alguma coisa.
-   */
   time: "a partir das 19h",
-  place: "Em casa",
-  /** Ainda vazio: sem endereço, o convidado não sabe em qual casa. */
+  place: "Casa Open",
+  /** Rua e número, quando houver. Vazio não aparece no convite. */
   address: "",
-  /** Até quando dá para confirmar. Vazio = sem prazo declarado. */
-  rsvpBy: "",
+  /** O que vai ter. Vazios não aparecem, como o endereço. */
+  food: "Churrasco tradicional",
+  drinks: "Open bar de chopp e drinks",
 } as const;
 
-/** 40 + 30. Somado no código para nunca discordar das idades acima. */
+/** 30 + 40. Somado no código para nunca discordar das idades acima. */
 export const TOTAL_AGE = PARTY.hosts.reduce((sum, h) => sum + h.age, 0);
 
-/** "Daniel e Bruno" */
+/** "Bruno e Daniel" */
 export const HOST_NAMES = PARTY.hosts.map((h) => h.name).join(" e ");
 
 // ── Shows ──────────────────────────────────────────────
@@ -44,7 +40,6 @@ export type Effect =
   | "discoteca"
   | "estrobo"
   | "confete"
-  | "espiral"
   | "ondas"
   | "salgueiro"
   | "orbes"
@@ -52,7 +47,6 @@ export type Effect =
 
 export type Show = {
   id: string;
-  /** Nome do show, exibido ao convidado como "seu" show. */
   label: string;
   effect: Effect;
   /** Cores das partículas. A primeira também tinge o brilho do fundo. */
@@ -62,18 +56,28 @@ export type Show = {
     youtubeId: string;
     title: string;
     artist: string;
+    /**
+     * Segundo em que a música começa a tocar no convite.
+     *
+     * O convite dura poucos segundos de atenção, e clipe oficial costuma ter
+     * introdução, vinheta ou falação antes do som entrar — começar em zero
+     * era abrir a festa no silêncio. Aqui cai direto no refrão.
+     *
+     * **São estimativas.** Conferi os vídeos, não os cronômetros: não tive
+     * como ouvir nada daqui. Se alguma entrar no lugar errado, é só ajustar
+     * este número — nada mais depende dele.
+     */
+    start: number;
   };
 };
 
 /**
- * Um show por convidado, escolhido pelo hash do slug.
+ * Um show por visita, sorteado.
  *
  * Rock brasileiro. Só entram vídeos de canal oficial — VEVO, gravadora, canal
  * da própria banda ou canal "- Topic", que é upload automático da gravadora.
  * Canal de fã some sem aviso e o convite abriria com vídeo indisponível
  * justamente na hora do "tchan".
- * Se algum cair mesmo assim, o player mostra o fallback e a festa continua;
- * para trocar, edite `youtubeId` aqui ou o vídeo do convidado no painel.
  */
 export const SHOWS: Show[] = [
   {
@@ -81,14 +85,24 @@ export const SHOWS: Show[] = [
     label: "Bom Brasileiro",
     effect: "fogos",
     palette: ["#1b40c6", "#4a6ede", "#0d2a8f"],
-    song: { youtubeId: "toLHh5MWQIc", title: "Bom Brasileiro", artist: "Cachorro Grande" },
+    song: {
+      youtubeId: "toLHh5MWQIc",
+      title: "Bom Brasileiro",
+      artist: "Cachorro Grande",
+      start: 48,
+    },
   },
   {
     id: "que-loucura",
     label: "Que Loucura",
     effect: "estrobo",
     palette: ["#1b40c6", "#8ea4ec", "#0d2a8f"],
-    song: { youtubeId: "Sc4zAXr0kd0", title: "Que Loucura!", artist: "Cachorro Grande" },
+    song: {
+      youtubeId: "Sc4zAXr0kd0",
+      title: "Que Loucura!",
+      artist: "Cachorro Grande",
+      start: 42,
+    },
   },
   {
     id: "um-minuto",
@@ -99,6 +113,7 @@ export const SHOWS: Show[] = [
       youtubeId: "x7UHl9Kf2CI",
       title: "Um Minuto Para o Fim do Mundo",
       artist: "CPM 22",
+      start: 52,
     },
   },
   {
@@ -106,39 +121,64 @@ export const SHOWS: Show[] = [
     label: "Sonífera",
     effect: "orbes",
     palette: ["#1b40c6", "#4a6ede", "#8ea4ec"],
-    song: { youtubeId: "_yL-mT4y9No", title: "Sonífera Ilha", artist: "Titãs" },
+    song: {
+      youtubeId: "_yL-mT4y9No",
+      title: "Sonífera Ilha",
+      artist: "Titãs",
+      start: 22,
+    },
   },
   {
     id: "mulher-de-fases",
     label: "Fases",
     effect: "confete",
     palette: ["#1b40c6", "#4a6ede", "#0d2a8f"],
-    song: { youtubeId: "FkXWfreN2QA", title: "Mulher de Fases", artist: "Raimundos" },
+    song: {
+      youtubeId: "FkXWfreN2QA",
+      title: "Mulher de Fases",
+      artist: "Raimundos",
+      start: 46,
+    },
   },
   {
     id: "garota-nacional",
     label: "Garota Nacional",
     effect: "discoteca",
     palette: ["#6b88e4", "#1b40c6", "#0d2a8f"],
-    song: { youtubeId: "DjPtwYunRq4", title: "Garota Nacional", artist: "Skank" },
+    song: {
+      youtubeId: "DjPtwYunRq4",
+      title: "Garota Nacional",
+      artist: "Skank",
+      start: 58,
+    },
   },
   {
     id: "zoio-de-lula",
     label: "Zóio de Lula",
     effect: "ondas",
     palette: ["#1b40c6", "#6b88e4", "#0d2a8f"],
-    song: { youtubeId: "Df_gGM1h9No", title: "Zóio de Lula", artist: "Charlie Brown Jr." },
+    song: {
+      youtubeId: "Df_gGM1h9No",
+      title: "Zóio de Lula",
+      artist: "Charlie Brown Jr.",
+      start: 38,
+    },
   },
   {
     id: "anna-julia",
     label: "Anna Júlia",
     effect: "purpurina",
     palette: ["#4a6ede", "#1b40c6", "#8ea4ec"],
-    song: { youtubeId: "umMIcZODm2k", title: "Anna Júlia", artist: "Los Hermanos" },
+    song: {
+      youtubeId: "umMIcZODm2k",
+      title: "Anna Júlia",
+      artist: "Los Hermanos",
+      start: 46,
+    },
   },
   {
     // O efeito é o salgueiro, aquele fogo que desce devagar como chuva — daí
-    // o nome sair da própria música, em vez do apelido anterior.
+    // o nome sair da própria música.
     id: "chove",
     label: "Chove",
     effect: "salgueiro",
@@ -147,6 +187,7 @@ export const SHOWS: Show[] = [
       youtubeId: "qiU_XXucYBE",
       title: "Primeiros Erros (Chove)",
       artist: "Capital Inicial",
+      start: 55,
     },
   },
   {
@@ -154,42 +195,22 @@ export const SHOWS: Show[] = [
     label: "Óculos",
     effect: "raios",
     palette: ["#0d2a8f", "#4a6ede", "#1b40c6"],
-    song: { youtubeId: "IltVPNqYybw", title: "Óculos", artist: "Os Paralamas do Sucesso" },
-  },
-  {
-    id: "chip-novo",
-    label: "Chip Novo",
-    effect: "espiral",
-    palette: ["#4a6ede", "#0d2a8f", "#1b40c6"],
-    song: { youtubeId: "aXJ_Ub1xbhw", title: "Admirável Chip Novo", artist: "Pitty" },
+    song: {
+      youtubeId: "IltVPNqYybw",
+      title: "Óculos",
+      artist: "Os Paralamas do Sucesso",
+      start: 40,
+    },
   },
 ];
 
-/**
- * Hash estável de string (FNV-1a de 32 bits).
- *
- * Precisa ser determinístico e igual nos dois lados: o servidor grava o índice
- * na criação do convidado, mas a página aberta escolhe o show antes de existir
- * documento. Se as duas contas divergissem, a pessoa veria um show ao abrir o
- * link e outro depois de confirmar.
- */
-export function hashString(s: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h >>> 0;
+/** Sorteia um show. Cada visita ganha o seu — o link é o mesmo para todos. */
+export function randomShow(): Show {
+  return SHOWS[Math.floor(Math.random() * SHOWS.length)];
 }
 
-export function showIndexFor(seed: string): number {
-  return hashString(seed) % SHOWS.length;
-}
-
-export function showAt(index: number): Show {
-  // Índice fora da faixa acontece de verdade: basta remover um show do array
-  // depois que convidados já foram criados com o índice antigo gravado.
-  return SHOWS[((index % SHOWS.length) + SHOWS.length) % SHOWS.length];
+export function showById(id: string): Show | undefined {
+  return SHOWS.find((s) => s.id === id);
 }
 
 // ── Nomes ──────────────────────────────────────────────
@@ -197,53 +218,32 @@ export function showAt(index: number): Show {
 /**
  * Chave de comparação de nomes: minúsculas, sem acento, espaços colapsados.
  *
- * É o que faz "José Da Silva" digitado no link aberto encontrar o "Jose da
- * Silva" que os anfitriões cadastraram, em vez de criar um convidado duplicado.
+ * É o que faz "José Da Silva" encontrar o "Jose da Silva" já gravado, em vez
+ * de criar uma segunda linha na lista quando a pessoa muda de ideia e
+ * responde de novo.
  */
 export function nameKey(name: string): string {
   return name
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // marcas de acento soltas pelo NFD
+    .replace(/[̀-ͯ]/g, "") // marcas de acento soltas pelo NFD
     .toLowerCase()
     .replace(/\s+/g, " ")
     .trim();
 }
 
-/** Primeiro nome, para os cumprimentos. */
-export function firstName(name: string): string {
-  return name.trim().split(/\s+/)[0] ?? name;
-}
-
-const SLUG_ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789"; // sem l, o, 0, 1
-
-/**
- * Trecho do link de cada convidado: base do nome + sufixo aleatório.
- *
- * O nome no slug é conveniência para os anfitriões conferirem a lista de links.
- * O sufixo é o que impede adivinhar o link de outra pessoa a partir do nome —
- * sem ele, quem recebesse `/c/maria-silva` responderia pelo vizinho.
- */
-export function makeSlug(name: string, random: () => number = Math.random): string {
-  const base =
-    nameKey(name)
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .slice(0, 24)
-      .replace(/^-+|-+$/g, "") || "convidado";
-  let suffix = "";
-  for (let i = 0; i < 5; i++) {
-    suffix += SLUG_ALPHABET[Math.floor(random() * SLUG_ALPHABET.length)];
-  }
-  return `${base}-${suffix}`;
-}
-
 // ── RSVP ───────────────────────────────────────────────
 
-export type RsvpStatus = "pending" | "yes" | "no";
+/**
+ * Só "vai" ou "não vai".
+ *
+ * Não existe mais "sem resposta": com link único não há convidado
+ * pré-cadastrado, então quem está na base é exatamente quem respondeu.
+ */
+export type RsvpStatus = "yes" | "no";
 
 export type RsvpDraft = {
   name: string;
-  status: RsvpStatus;
+  status: RsvpStatus | "";
   plusOne: boolean;
   plusOneName: string;
   kids: number;
@@ -282,7 +282,7 @@ export function validateRsvp(d: RsvpDraft): Record<string, string> {
   return e;
 }
 
-/** Quantas pessoas aquele convite leva à festa. */
+/** Quantas pessoas aquela resposta leva à festa. */
 export function headcount(g: {
   status: RsvpStatus;
   plusOne: boolean;
@@ -307,9 +307,8 @@ const DIAS = [
 /** "sábado, 14 de novembro de 2026" a partir de "2026-11-14". */
 export function longDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
-  // UTC de propósito: `new Date("2026-11-14")` já é UTC, e ler com getDay()
-  // local jogaria a data para 13/11 em qualquer fuso a oeste de Greenwich —
-  // ou seja, no Brasil inteiro.
+  // UTC de propósito: ler com getDay() local jogaria a data para 13/11 em
+  // qualquer fuso a oeste de Greenwich — ou seja, no Brasil inteiro.
   const dt = new Date(Date.UTC(y, m - 1, d));
   return `${DIAS[dt.getUTCDay()]}, ${d} de ${MESES[m - 1]} de ${y}`;
 }
@@ -326,4 +325,11 @@ export function daysUntil(iso: string, now: Date = new Date()): number {
   const target = Date.UTC(y, m - 1, d);
   const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   return Math.round((target - today) / 86_400_000);
+}
+
+/** "14/11/2026 21:30" para a coluna de quando respondeu. */
+export function stamp(iso: string): string {
+  const d = new Date(iso);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getDate())}/${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }

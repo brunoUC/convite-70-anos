@@ -67,12 +67,15 @@ function loadApi(): Promise<any> {
 
 export function Music({
   videoId,
+  start,
   active,
   title,
   artist,
 }: {
   /** Vídeo do show. Fixo desde a abertura — trocar recomeça a faixa. */
   videoId: string;
+  /** Segundo do refrão: onde a música deve entrar. */
+  start: number;
   /** false = ainda na cortina, tocando mudo; true = convite aberto, com som. */
   active: boolean;
   title: string;
@@ -97,6 +100,7 @@ export function Music({
         playerRef.current = new YT.Player(hostRef.current, {
           videoId,
           playerVars: {
+            start,
             autoplay: 1,
             mute: 1, // sem isto o autoplay é barrado e não há o que desmutar
             controls: 0,
@@ -126,15 +130,19 @@ export function Music({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // O clique abriu o convite: tira o mudo.
+  // O clique abriu o convite: volta ao refrão e tira o mudo.
   useEffect(() => {
     if (!active || !ready || muted) return;
     const p = playerRef.current;
     if (!p) return;
+    // O seek não é redundante com o `start`: a faixa vem tocando mudinha desde
+    // o carregamento, então quando a pessoa demora para clicar ela já passou
+    // do refrão. Sem voltar, o som entraria no meio de um verso qualquer.
+    p.seekTo(start, true);
     p.unMute();
     p.setVolume(65);
     p.playVideo();
-  }, [active, ready, muted]);
+  }, [active, ready, muted, start]);
 
   const toggleMute = () => {
     const p = playerRef.current;
@@ -149,6 +157,7 @@ export function Music({
   };
 
   const forcePlay = () => {
+    playerRef.current?.seekTo?.(start, true);
     playerRef.current?.unMute?.();
     playerRef.current?.playVideo?.();
     setMuted(false);

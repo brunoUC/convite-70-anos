@@ -12,9 +12,18 @@ dos anos 70 e confirma presença ali mesmo.
 
 | Rota | Quem usa | O que faz |
 |---|---|---|
-| `/` | quem cai sem link pessoal | Convite; a pessoa digita o nome |
-| `/c/<slug>` | cada convidado | Convite pessoal, com show próprio |
-| `/festaadmin` | Daniel e Bruno | Lista, totais, links e CSV — sem senha |
+| `/` | todos os convidados | Convite; a pessoa digita o nome e responde |
+| `/festaadmin` | Bruno e Daniel | Dashboard, tabela de respostas e CSV — sem senha |
+
+**O link é o mesmo para todo mundo.** Não há convite pessoal nem convidado
+pré-cadastrado: o show é sorteado a cada visita, então duas pessoas abrindo o
+mesmo endereço pegam trilha e animação diferentes. Some junto o estado "sem
+resposta" — sem lista de quem foi convidado, não há como saber quem faltou, e
+essa contagem não era necessária.
+
+Quem responde duas vezes não vira duas linhas: o nome é casado por uma chave
+normalizada (minúsculas, sem acento, espaços colapsados), então "maria
+APARECIDA" atualiza a linha da "Maria Aparecida".
 
 A abertura reproduz o save-the-date impresso, com um botão. No clique estouram
 os fogos e entra a música; em seguida aparecem a data, a contagem regressiva e
@@ -104,19 +113,11 @@ Settings → Deployment Protection → Vercel Authentication → Disable.
 
 ## Uso
 
-1. Entre em `/festaadmin` e cole a lista de nomes, um por linha.
-2. Cada nome ganha um link `/c/<slug>`. Copie e mande por WhatsApp.
-3. As respostas aparecem na hora: o Convex é reativo, sem recarregar a página.
-4. `baixar CSV` exporta tudo com BOM, para o Excel em português não transformar
+1. Mande **https://convite-70-anos.vercel.app** para todo mundo. É só isso.
+2. Acompanhe em `/festaadmin`: os totais em cima, a tabela de respostas
+   embaixo. As respostas aparecem na hora — o Convex é reativo, sem recarregar.
+3. `baixar CSV` exporta tudo com BOM, para o Excel em português não transformar
    "José" em "JosÃ©".
-
-O slug leva um sufixo aleatório de propósito. Sem ele, `/c/maria-silva` seria
-adivinhável e o vizinho responderia pela Maria.
-
-Quem responde pelo link aberto e já estava cadastrado **não** vira linha nova:
-o nome digitado é casado com o cadastro por uma chave normalizada — minúsculas,
-sem acento, espaços colapsados —, então "José Da Silva" encontra o "Jose da
-Silva" da lista.
 
 ---
 
@@ -138,7 +139,12 @@ camada por cima:
 | Anna Júlia | Anna Júlia — Los Hermanos | purpurina |
 | Chove | Primeiros Erros (Chove) — Capital Inicial | salgueiro |
 | Óculos | Óculos — Os Paralamas do Sucesso | raios |
-| Chip Novo | Admirável Chip Novo — Pitty | espiral |
+
+Cada faixa tem um campo `start`: o segundo em que ela entra. Clipe oficial
+costuma ter introdução antes do som, e o convite tem poucos segundos de
+atenção — começar em zero era abrir a festa no silêncio. **Esses números são
+estimativas**, conferi os vídeos e não os cronômetros; se alguma entrar no
+lugar errado, ajuste o `start` e nada mais.
 
 Só entraram vídeos de **canal oficial** — VEVO, gravadora, canal da própria
 banda ou canal `- Topic`, que é upload automático da gravadora — e cada ID foi

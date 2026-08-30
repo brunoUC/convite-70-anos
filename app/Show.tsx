@@ -45,7 +45,14 @@ type P = {
   spin: number;
 };
 
-const MAX_PARTICLES = 900;
+/*
+ * Teto de partículas. Menor no celular, que é onde o convite quase sempre
+ * abre: o link chega por WhatsApp. Aparelho de entrada engasga bem antes de
+ * 900 partículas, e o resultado seria animação travada — pior que animação
+ * mais rala.
+ */
+const MAX_PARTICLES_DESKTOP = 900;
+const MAX_PARTICLES_MOBILE = 380;
 const BG = "#f6f2e8";
 
 export function Show({
@@ -63,6 +70,8 @@ export function Show({
   const effectRef = useRef(effect);
   const paletteRef = useRef(palette);
   const runningRef = useRef(running);
+  /** Preenchida pelo efeito de montagem; chamada quando o convite abre. */
+  const abrirRef = useRef<(() => void) | null>(null);
   effectRef.current = effect;
   paletteRef.current = palette;
   runningRef.current = running;
@@ -80,12 +89,19 @@ export function Show({
       typeof matchMedia === "function" &&
       matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // Decidido uma vez: girar o aparelho não deve rebaixar a animação no meio.
+    const celular = Math.min(innerWidth, innerHeight) < 520;
+    const teto = celular ? MAX_PARTICLES_MOBILE : MAX_PARTICLES_DESKTOP;
+
     let w = 0;
     let h = 0;
     const resize = () => {
       // DPR limitado a 2: em telas 3x o ganho visual de partícula borrada é
       // nulo e o custo por quadro é o dobro, justo no celular.
-      const dpr = Math.min(devicePixelRatio || 1, 2);
+      // No celular o canvas é grande em relação à CPU. Teto de 1.5 em vez de
+      // 2 corta ~44% dos pixels por quadro sem diferença perceptível em
+      // partícula, que é borrada por natureza.
+      const dpr = Math.min(devicePixelRatio || 1, celular ? 1.5 : 2);
       w = canvas.clientWidth;
       h = canvas.clientHeight;
       canvas.width = Math.floor(w * dpr);
@@ -104,7 +120,7 @@ export function Show({
     const push = (p: P) => {
       // Descartar o mais antigo em vez de recusar o novo mantém o show vivo
       // quando lota: o que interessa é sempre o que acabou de estourar.
-      if (ps.length >= MAX_PARTICLES) ps.shift();
+      if (ps.length >= teto) ps.shift();
       ps.push(p);
     };
 
@@ -207,10 +223,16 @@ export function Show({
 
     const step = () => {
       raf = requestAnimationFrame(step);
-      frame++;
 
       const on = runningRef.current;
       const eff = effectRef.current;
+
+      // Na cortina não há nada para animar. Sem esta saída, o navegador
+      // repintava a tela 60 vezes por segundo para não mostrar nada — gasto
+      // de bateria à toa justo antes da parte que importa.
+      if (!on && ps.length === 0) return;
+
+      frame++;
 
       // Rastro: em vez de limpar, pinta o fundo semitransparente por cima.
       // É o que dá cauda às faíscas sem guardar posições antigas.
@@ -301,17 +323,30 @@ export function Show({
 
     /** Quem nasce a cada quadro, por show. */
     function spawn(eff: Effect, f: number) {
-      // Base comum: foguetes. É o "estrondante" de todo convite.
-      const every = eff === "fogos" ? 22 : eff === "supernova" ? 30 : 42;
-      if (f % every === 0) rocket();
-      if (f % every === 11 && eff === "fogos") rocket();
+      // Foguete é a assinatura do show "fogos", e só dele.
+      //
+      // Antes subiam em todos, e o efeito próprio de cada show entrava só como
+      // detalhe por cima — o resultado é que os dez pareciam o mesmo fundo.
+      // Agora cada show tem o fundo dele. O estouro de abertura, esse sim,
+      // continua acontecendo em todos.
+      if (eff === "fogos") {
+        if (f % 22 === 0) rocket();
+        if (f % 22 === 11) rocket();
+      }
 
       switch (eff) {
+        case "salgueiro":
+          // Sem foguete não há estouro para virar salgueiro, então ele nasce
+          // direto no alto, já aberto.
+          if (f % 62 === 0) {
+            willow(w * (0.2 + Math.random() * 0.6), h * (0.16 + Math.random() * 0.2));
+          }
+          break;
+
         // Chuvas contínuas nascem em quadros alternados. A três por quadro,
         // com 260 de vida, chegavam a ~780 partículas simultâneas e a tela
         // fechava — no teste dava para ver a chuva, não o convite.
         case "purpurina":
-          if (f % 2) break;
           for (let i = 0; i < 2; i++) {
             push({
               x: Math.random() * w,
@@ -332,9 +367,14 @@ export function Show({
           break;
 
         case "supernova":
-          if (f % 150 === 0) {
+          if (f % 90 === 0) {
             burst(w / 2, h * 0.42, 160, 7.5);
             burst(w / 2, h * 0.42, 80, 3.4);
+          }
+          // Entre um estouro e outro havia ~2 s de tela vazia, e quem abrisse
+          // no intervalo achava que não tinha animação nenhuma.
+          if (f % 5 === 0) {
+            spark(w / 2, h * 0.42, { speed: 2.2, max: 70, grav: 0.02, drag: 0.99 });
           }
           break;
 
@@ -358,21 +398,6 @@ export function Show({
             });
           }
           break;
-
-        case "espiral": {
-          // Dois braços opostos girando: sozinho, um braço lê como rabisco.
-          const t = f * 0.09;
-          const r = 30 + ((f * 2.4) % (Math.min(w, h) * 0.42));
-          for (const arm of [0, Math.PI]) {
-            spark(w / 2 + Math.cos(t + arm) * r, h * 0.42 + Math.sin(t + arm) * r, {
-              speed: 0.7,
-              max: 60,
-              grav: 0.004,
-              drag: 0.99,
-            });
-          }
-          break;
-        }
 
         case "orbes":
           if (f % 7 === 0) {
@@ -406,8 +431,8 @@ export function Show({
           break;
 
         case "ondas":
-          if (f % 3 === 0) {
-            const n = 9;
+          if (f % 2 === 0) {
+            const n = 13;
             for (let i = 0; i < n; i++) {
               const x = (i / (n - 1)) * w;
               const y = h * 0.5 + Math.sin(f * 0.05 + i * 0.7) * h * 0.16;
@@ -485,7 +510,9 @@ export function Show({
           ctx.translate(cx, cy);
           ctx.rotate(a);
           const g = ctx.createLinearGradient(0, 0, Math.max(w, h), 0);
-          g.addColorStop(0, `${p0}${Math.round(pulse * 60).toString(16).padStart(2, "0")}`);
+          // Alpha era no máximo 0x3c (~23%): sobre fundo escuro isso brilhava, sobre
+          // creme desaparecia. 0xc8 é o que faz o raio existir na tela clara.
+          g.addColorStop(0, `${p0}${Math.round(60 + pulse * 140).toString(16).padStart(2, "0")}`);
           g.addColorStop(1, "#f6f2e800");
           ctx.fillStyle = g;
           ctx.beginPath();
@@ -499,26 +526,37 @@ export function Show({
       }
     }
 
-    // Abertura: não esperar o primeiro foguete subir. O convite tem que
-    // estourar no instante do clique.
-    if (running && !reduced) {
+    /*
+     * O estouro do clique.
+     *
+     * Guardado numa ref em vez de rodar aqui: a cortina e o convite dividem a
+     * mesma árvore, então este efeito monta uma vez só, com `running` ainda
+     * false. Rodando aqui, o estouro nunca acontecia — o convite abria no
+     * vazio e só depois o fundo começava.
+     */
+    abrirRef.current = () => {
+      if (reduced) return;
       burst(w * 0.3, h * 0.35, 80, 5);
       burst(w * 0.7, h * 0.3, 80, 5);
       setTimeout(() => burst(w * 0.5, h * 0.45, 130, 6.5), 260);
-      setTimeout(() => {
-        rocket();
-        rocket();
-      }, 520);
-    }
+      setTimeout(() => burst(w * 0.42, h * 0.28, 110, 5.8), 560);
+    };
+    if (running) abrirRef.current();
 
     raf = requestAnimationFrame(step);
     return () => {
       cancelAnimationFrame(raf);
       removeEventListener("resize", resize);
+      abrirRef.current = null;
     };
     // Monta uma vez. As mudanças de show entram pelos refs acima.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Dispara o estouro no instante em que o convite abre.
+  useEffect(() => {
+    if (running) abrirRef.current?.();
+  }, [running]);
 
   return <canvas ref={ref} className="show-canvas" aria-hidden="true" />;
 }

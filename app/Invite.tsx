@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import {
@@ -10,11 +10,9 @@ import {
   PARTY,
   TOTAL_AGE,
   daysUntil,
-  firstName,
   longDate,
+  randomShow,
   shortDate,
-  SHOWS,
-  showAt,
   validateRsvp,
   type RsvpDraft,
 } from "../convex/lib/party";
@@ -22,75 +20,42 @@ import { Show } from "./Show";
 import { Music } from "./Music";
 import { CheckerRule, Pour, Toast } from "./Art";
 
-type Guest = {
-  slug: string;
-  name: string;
-  showIndex: number;
-  youtubeId: string;
-  status: "pending" | "yes" | "no";
-  plusOne: boolean;
-  plusOneName: string;
-  kids: number;
-  kidsNames: string;
-  note: string;
-  respondedAt: string | null;
-} | null;
-
 /**
- * O convite inteiro, usado pelas duas portas de entrada:
- *
- * - `/c/<slug>`: link pessoal, já sabe quem é e qual o show dela;
- * - `/`: link aberto, a pessoa se apresenta e o show sai do nome.
- *
- * A cortina existe por imposição do navegador, não por gosto: som só toca
- * depois de um gesto do usuário. Como o clique é obrigatório de qualquer
- * forma, ele virou o momento do estouro.
+ * O convite. Um só, para todo mundo: o link é o mesmo e o show é sorteado a
+ * cada visita, então duas pessoas abrindo o mesmo endereço pegam trilhas e
+ * animações diferentes.
  */
-export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
+export function Invite() {
   const [open, setOpen] = useState(false);
   const count = useQuery(api.party.publicCount, {});
   const respond = useMutation(api.party.respond);
 
-  const [name, setName] = useState(guest?.name ?? "");
-  const [status, setStatus] = useState<"yes" | "no" | "">(
-    guest && guest.status !== "pending" ? guest.status : "",
-  );
-  const [plusOne, setPlusOne] = useState(guest?.plusOne ?? false);
-  const [plusOneName, setPlusOneName] = useState(guest?.plusOneName ?? "");
-  const [kids, setKids] = useState(guest?.kids ?? 0);
-  const [kidsNames, setKidsNames] = useState(guest?.kidsNames ?? "");
-  const [note, setNote] = useState(guest?.note ?? "");
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState<"yes" | "no" | "">("");
+  const [plusOne, setPlusOne] = useState(false);
+  const [plusOneName, setPlusOneName] = useState("");
+  const [kids, setKids] = useState(0);
+  const [kidsNames, setKidsNames] = useState("");
+  const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(guest ? guest.status !== "pending" : false);
+  const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
 
   /**
-   * O show é escolhido uma vez e não muda mais.
+   * Sorteado uma vez e fixo daí em diante.
    *
-   * Com convite pessoal vem do documento. No link aberto sorteamos na
-   * abertura — antes ele saía do nome digitado, e como o vídeo acompanha o
-   * show, a música recomeçava do zero a cada letra digitada no campo de nome.
+   * `useState` com função inicial, e não `Math.random()` solto no corpo: solto,
+   * ele sortearia de novo a cada re-render — e como o vídeo acompanha o show, a
+   * música recomeçaria a cada letra digitada no campo de nome.
    */
-  const [sorteado] = useState(() => Math.floor(Math.random() * SHOWS.length));
-  const show = useMemo(
-    () => showAt(guest ? guest.showIndex : sorteado),
-    [guest, sorteado],
-  );
+  const [show] = useState(randomShow);
 
-  const videoId = guest?.youtubeId || show.song.youtubeId;
   const dias = daysUntil(PARTY.date);
-
-  // O título da aba vira parte do presente quando o link chega pelo WhatsApp.
-  useEffect(() => {
-    document.title = guest
-      ? `${firstName(guest.name)}, você está convidado · ${TOTAL_AGE} anos`
-      : `${HOST_NAMES} · ${TOTAL_AGE} anos`;
-  }, [guest]);
 
   const draft: RsvpDraft = {
     name,
-    status: status || "pending",
+    status,
     plusOne,
     plusOneName,
     kids,
@@ -109,7 +74,7 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
     setSending(true);
     try {
       await respond({
-        slug,
+        showId: show.id,
         name: name.trim(),
         status,
         plusOne,
@@ -140,7 +105,8 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
     <>
       <Show effect={show.effect} palette={show.palette} running={open} />
       <Music
-        videoId={videoId}
+        videoId={show.song.youtubeId}
+        start={show.song.start}
         active={open}
         title={show.song.title}
         artist={show.song.artist}
@@ -154,10 +120,6 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
       <main className="festa-root curtain">
         {palco}
         <div className="curtain-inner">
-          {guest && (
-            <p className="curtain-kicker">{firstName(guest.name)}, isto é para você</p>
-          )}
-
           {/* A escada do cartaz impresso, na mesma ordem e no mesmo recuo. */}
           <p className="std-1">Save the date</p>
           <p className="std-2">Birthday party</p>
@@ -194,7 +156,7 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
       <div className="festa-wrap">
         <header className="festa-hero">
           <p className="festa-kicker">
-            {guest ? `${firstName(guest.name)}, você está convidado para` : "você está convidado para"}
+            você está convidado para
           </p>
 
           <h1 className="lockup">
@@ -243,6 +205,22 @@ export function Invite({ slug, guest }: { slug?: string; guest?: Guest }) {
                 <dd>
                   <strong>{PARTY.place}</strong>
                   {PARTY.address && <> · {PARTY.address}</>}
+                </dd>
+              </div>
+            )}
+            {PARTY.food && (
+              <div>
+                <dt>comida</dt>
+                <dd>
+                  <strong>{PARTY.food}</strong>
+                </dd>
+              </div>
+            )}
+            {PARTY.drinks && (
+              <div>
+                <dt>bebida</dt>
+                <dd>
+                  <strong>{PARTY.drinks}</strong>
                 </dd>
               </div>
             )}
