@@ -275,7 +275,17 @@ export function validateRsvp(d: RsvpDraft): Record<string, string> {
   if (d.kids < 0 || d.kids > MAX_KIDS || !Number.isInteger(d.kids)) {
     e.kids = `de 0 a ${MAX_KIDS} crianças`;
   }
-  if (d.plusOneName.trim().length > 80) e.plusOneName = "nome longo demais";
+  // Nome do acompanhante é obrigatório para quem marca o +1: "Fulano + 1" não
+  // serve para lista de entrada nem para mapa de mesa, que é para onde essa
+  // lista vai. Só cobrado de quem vai e marcou — quem não marcou não vê o
+  // campo, e quem recusou já foi barrado acima.
+  if (d.status === "yes" && d.plusOne) {
+    const acompanhante = d.plusOneName.trim();
+    if (acompanhante.length < 2) e.plusOneName = "escreva o nome do acompanhante";
+    else if (acompanhante.length > 80) e.plusOneName = "nome longo demais";
+  } else if (d.plusOneName.trim().length > 80) {
+    e.plusOneName = "nome longo demais";
+  }
   if (d.kidsNames.trim().length > 200) e.kidsNames = "texto longo demais";
   if (d.note.length > MAX_NOTE) e.note = `no máximo ${MAX_NOTE} caracteres`;
 

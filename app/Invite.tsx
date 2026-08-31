@@ -256,7 +256,7 @@ export function Invite() {
             {status === "yes" ? (
               <p>
                 Anotamos {name.trim()}
-                {plusOne && ` + ${plusOneName.trim() || "acompanhante"}`}
+                {plusOne && ` + ${plusOneName.trim()}`}
                 {kids > 0 && ` + ${kids} ${kids === 1 ? "criança" : "crianças"}`}. Nos vemos
                 em {shortDate(PARTY.date)}.
               </p>
@@ -328,8 +328,13 @@ export function Invite() {
                       id="acomp"
                       value={plusOneName}
                       onChange={(e) => setPlusOneName(e.target.value)}
-                      placeholder="opcional"
+                      placeholder="nome e sobrenome"
+                      autoComplete="off"
+                      aria-invalid={!!showErr("plusOneName")}
                     />
+                    {showErr("plusOneName") && (
+                      <span className="festa-err">{showErr("plusOneName")}</span>
+                    )}
                   </div>
                 )}
 
