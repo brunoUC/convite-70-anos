@@ -568,6 +568,61 @@ body {
   color: var(--azul);
 }
 
+/* ── Dica de rolagem ───────────────────────────────── */
+
+/*
+ * Fica ACIMA do chip da música, que também é fixo no rodapé central — os dois
+ * disputariam o mesmo ponto. Some na primeira rolagem, então a sobreposição
+ * dura só o tempo em que a dica é útil.
+ */
+.dica-rolar {
+  position: fixed;
+  z-index: 4;
+  left: 50%;
+  bottom: 68px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font: 500 13px/1 var(--font-corpo), sans-serif;
+  letter-spacing: 0.06em;
+  padding: 13px 20px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--azul);
+  color: var(--creme);
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(27, 64, 198, 0.28);
+  animation: surge 0.4s ease-out both;
+}
+
+.dica-rolar:hover { background: var(--azul-fundo); }
+
+/*
+ * Só a seta balança; o botão fica parado.
+ *
+ * Com o botão inteiro em movimento, o alvo de toque muda de lugar debaixo do
+ * dedo — e foi isso que o teste automatizado flagrou ao recusar o clique por
+ * "element is not stable". O movimento serve para chamar atenção, não precisa
+ * arrastar a área clicável junto.
+ */
+.dica-seta {
+  display: inline-block;
+  animation: flutua 1.9s 0.4s ease-in-out infinite;
+}
+
+@keyframes surge {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes flutua {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
 /* ── Música ────────────────────────────────────────── */
 
 /* Na cortina o player já existe (tocando mudo), mas o controle não aparece. */

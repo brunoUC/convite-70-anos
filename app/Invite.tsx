@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import {
@@ -27,6 +27,37 @@ import { CheckerRule, Pour, Toast } from "./Art";
  */
 export function Invite() {
   const [open, setOpen] = useState(false);
+
+  /*
+   * Dica de "tem mais coisa aqui embaixo".
+   *
+   * Subir o formulário para o topo resolveu o botão de resposta, mas escondeu
+   * as informações da festa: sem nada indicando continuação, a primeira tela
+   * parece a página inteira. A dica aparece só enquanto a pessoa está no topo
+   * e some assim que ela rola — cumprido o papel, sai da frente.
+   */
+  const [mostrarDica, setMostrarDica] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const avaliar = () => {
+      // Só faz sentido se houver mesmo o que rolar. A margem de 120px evita
+      // a dica aparecer por causa de uma sobra de dois pixels.
+      const rolavel = document.documentElement.scrollHeight - innerHeight > 120;
+      setMostrarDica(rolavel && scrollY < 80);
+    };
+
+    // Um quadro depois: a coluna entra com animação e a altura ainda cresce.
+    const t = setTimeout(avaliar, 1200);
+    addEventListener("scroll", avaliar, { passive: true });
+    addEventListener("resize", avaliar);
+    return () => {
+      clearTimeout(t);
+      removeEventListener("scroll", avaliar);
+      removeEventListener("resize", avaliar);
+    };
+  }, [open]);
   const count = useQuery(api.party.publicCount, {});
   const respond = useMutation(api.party.respond);
 
@@ -104,6 +135,19 @@ export function Invite() {
   const palco = (
     <>
       <Show effect={show.effect} palette={show.palette} running={open} />
+      {mostrarDica && (
+        <button
+          className="dica-rolar"
+          onClick={() =>
+            document
+              .querySelector(".festa-detalhes")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }
+        >
+          veja os detalhes <span className="dica-seta" aria-hidden="true">↓</span>
+        </button>
+      )}
+
       <Music
         videoId={show.song.youtubeId}
         start={show.song.start}
