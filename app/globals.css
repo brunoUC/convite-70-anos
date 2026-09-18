@@ -113,6 +113,8 @@ body {
   font-family: var(--font-corpo), sans-serif;
   font-weight: 300;
   font-size: clamp(76px, 26vw, 140px);
+  /* Na cortina ele é o herói e pode ser enorme; no convite aberto divide a
+     primeira tela com o formulário. Ver `.festa-hero .lockup-num`. */
   line-height: 0.85;
   letter-spacing: -0.02em;
   color: var(--azul);
@@ -215,7 +217,9 @@ body {
   z-index: 1;
   max-width: 620px;
   margin: 0 auto;
-  padding: 48px 22px 96px;
+  /* Respiro curto no topo: cada pixel aqui é pixel que o botão de resposta
+     sobe, e no celular ele precisa caber na primeira tela. */
+  padding: 26px 22px 96px;
   animation: entra 0.9s 0.15s both ease-out;
 }
 
@@ -283,8 +287,13 @@ body {
   margin: 0 0 6px;
 }
 
+/* No convite aberto o lockup encolhe para o formulário subir. */
+.festa-hero .lockup { margin-top: 14px; }
+.festa-hero .lockup-num { font-size: clamp(58px, 17vw, 96px); }
+.festa-hero .lockup-word { font-size: clamp(26px, 8vw, 44px); }
+
 .festa-math {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   font-size: clamp(16px, 4.6vw, 20px);
   font-weight: 500;
   color: var(--azul);
@@ -314,6 +323,28 @@ body {
   margin: 28px 0;
   color: var(--linha);
 }
+
+/* ── Detalhes, abaixo do formulário ────────────────── */
+
+/*
+ * Tudo aqui é secundário: quem abriu o convite já respondeu (ou já viu como
+ * responder) antes de chegar nesta parte. Por isso o corpo menor.
+ */
+.festa-detalhes {
+  text-align: center;
+  font-size: 14px;
+}
+
+.festa-detalhes .festa-lead {
+  font-size: 13.5px;
+  margin-top: 0;
+}
+
+.festa-detalhes .festa-facts dt { width: 62px; font-size: 10px; }
+.festa-detalhes .festa-facts dd { font-size: 13.5px; }
+.festa-detalhes .festa-facts > div { padding: 11px 14px; }
+.festa-detalhes .festa-art { max-width: 240px; margin-top: 18px; }
+.festa-detalhes .festa-show { font-size: 12px; }
 
 /* ── Ficha de dados ────────────────────────────────── */
 

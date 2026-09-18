@@ -176,78 +176,6 @@ export function Invite() {
             ))}
           </p>
 
-          <p className="festa-lead">
-            A festa de {TOTAL_AGE} anos do {HOST_NAMES}. Não é erro de conta: são{" "}
-            {PARTY.hosts.map((h) => h.age).join(" + ")} somados, e a gente decidiu
-            comemorar tudo de uma vez.
-          </p>
-
-          <dl className="festa-facts">
-            <div>
-              <dt>quando</dt>
-              <dd>
-                <strong>{longDate(PARTY.date)}</strong>
-              </dd>
-            </div>
-            {/* Linha própria: junto da data, o horário quebrava deixando o
-                "·" órfão no começo da segunda linha. */}
-            {PARTY.time && (
-              <div>
-                <dt>horário</dt>
-                <dd>
-                  <strong>{PARTY.time}</strong>
-                </dd>
-              </div>
-            )}
-            {PARTY.place && (
-              <div>
-                <dt>onde</dt>
-                <dd>
-                  <strong>{PARTY.place}</strong>
-                  {PARTY.address && <> · {PARTY.address}</>}
-                </dd>
-              </div>
-            )}
-            {PARTY.food && (
-              <div>
-                <dt>comida</dt>
-                <dd>
-                  <strong>{PARTY.food}</strong>
-                </dd>
-              </div>
-            )}
-            {PARTY.drinks && (
-              <div>
-                <dt>bebida</dt>
-                <dd>
-                  <strong>{PARTY.drinks}</strong>
-                </dd>
-              </div>
-            )}
-            <div>
-              <dt>faltam</dt>
-              <dd>
-                {dias > 1 ? (
-                  <strong>{dias} dias</strong>
-                ) : dias === 1 ? (
-                  <strong>1 dia</strong>
-                ) : dias === 0 ? (
-                  <strong>é hoje!</strong>
-                ) : (
-                  <strong>já rolou</strong>
-                )}
-              </dd>
-            </div>
-          </dl>
-
-          <Toast className="festa-art" />
-
-          <p className="festa-show">
-            seu show é <strong>{show.label}</strong> — “{show.song.title}”,{" "}
-            {show.song.artist}
-          </p>
-
-          <CheckerRule className="regua" />
         </header>
 
         {sent ? (
@@ -269,20 +197,7 @@ export function Invite() {
           </section>
         ) : (
           <form className="festa-card" onSubmit={submit} noValidate>
-            <h2>confirme sua presença</h2>
-
-            <div className="festa-field">
-              <label htmlFor="nome">seu nome</label>
-              <input
-                id="nome"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="nome e sobrenome"
-                autoComplete="name"
-                aria-invalid={!!showErr("name")}
-              />
-              {showErr("name") && <span className="festa-err">{showErr("name")}</span>}
-            </div>
+            <h2>você vai?</h2>
 
             <div className="festa-choice" role="group" aria-label="você vai?">
               <button
@@ -309,6 +224,20 @@ export function Invite() {
               </button>
             </div>
             {touched && !status && <span className="festa-err">escolha uma opção</span>}
+
+            <div className="festa-field">
+              <label htmlFor="nome">seu nome</label>
+              <input
+                id="nome"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="nome e sobrenome"
+                autoComplete="name"
+                aria-invalid={!!showErr("name")}
+              />
+              {showErr("name") && <span className="festa-err">{showErr("name")}</span>}
+            </div>
+
 
             {status === "yes" && (
               <>
@@ -396,6 +325,90 @@ export function Invite() {
             </button>
           </form>
         )}
+
+        <CheckerRule className="regua" />
+
+        {/*
+          Os detalhes vêm DEPOIS do formulário, e menores.
+
+          Antes o convite abria com herói, parágrafo e ficha completa, e no
+          celular os botões "eu vou / não vou" caíam abaixo da dobra — quem
+          não rolasse não descobria que dava para responder ali. Agora o topo
+          tem só a identidade e o formulário; quem quiser os detalhes rola,
+          e quem só quer confirmar já vê o botão.
+        */}
+        <section className="festa-detalhes">
+        <p className="festa-lead">
+          A festa de {TOTAL_AGE} anos do {HOST_NAMES}. Não é erro de conta: são{" "}
+          {PARTY.hosts.map((h) => h.age).join(" + ")} somados, e a gente decidiu
+          comemorar tudo de uma vez.
+        </p>
+
+        <dl className="festa-facts">
+          <div>
+            <dt>quando</dt>
+            <dd>
+              <strong>{longDate(PARTY.date)}</strong>
+            </dd>
+          </div>
+          {/* Linha própria: junto da data, o horário quebrava deixando o
+              "·" órfão no começo da segunda linha. */}
+          {PARTY.time && (
+            <div>
+              <dt>horário</dt>
+              <dd>
+                <strong>{PARTY.time}</strong>
+              </dd>
+            </div>
+          )}
+          {PARTY.place && (
+            <div>
+              <dt>onde</dt>
+              <dd>
+                <strong>{PARTY.place}</strong>
+                {PARTY.address && <> · {PARTY.address}</>}
+              </dd>
+            </div>
+          )}
+          {PARTY.food && (
+            <div>
+              <dt>comida</dt>
+              <dd>
+                <strong>{PARTY.food}</strong>
+              </dd>
+            </div>
+          )}
+          {PARTY.drinks && (
+            <div>
+              <dt>bebida</dt>
+              <dd>
+                <strong>{PARTY.drinks}</strong>
+              </dd>
+            </div>
+          )}
+          <div>
+            <dt>faltam</dt>
+            <dd>
+              {dias > 1 ? (
+                <strong>{dias} dias</strong>
+              ) : dias === 1 ? (
+                <strong>1 dia</strong>
+              ) : dias === 0 ? (
+                <strong>é hoje!</strong>
+              ) : (
+                <strong>já rolou</strong>
+              )}
+            </dd>
+          </div>
+        </dl>
+
+        <Toast className="festa-art" />
+
+        <p className="festa-show">
+          seu show é <strong>{show.label}</strong> — “{show.song.title}”,{" "}
+          {show.song.artist}
+        </p>
+        </section>
 
         <footer className="festa-foot">
           <Pour className="foot-art" />
