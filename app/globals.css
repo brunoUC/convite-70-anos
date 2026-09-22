@@ -568,6 +568,37 @@ body {
   color: var(--azul);
 }
 
+/* ── Botão da agenda ───────────────────────────────── */
+
+/*
+ * Contornado, não preenchido: aparece duas vezes na página — na confirmação e
+ * na ficha — e em azul cheio brigaria com "enviar resposta", que é a ação
+ * principal. Aqui ele é o convite para uma ação secundária.
+ */
+.btn-agenda {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px auto 0;
+  font: 500 13px/1.3 var(--font-corpo), sans-serif;
+  text-decoration: none;
+  text-align: center;
+  padding: 13px 20px;
+  min-height: 46px;
+  border: 1.5px solid var(--azul);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--azul);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-agenda:hover { background: var(--azul); color: var(--creme); }
+
+/* Na ficha ele é bloco centrado; na confirmação segue o fluxo do cartão. */
+.festa-detalhes .btn-agenda { display: flex; width: fit-content; }
+
 /* ── Dica de rolagem ───────────────────────────────── */
 
 /*

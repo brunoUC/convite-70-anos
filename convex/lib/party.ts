@@ -16,7 +16,18 @@ export const PARTY = {
   ],
   /** Data da festa. Trocar aqui muda o convite, a contagem e o painel. */
   date: "2026-11-14",
-  time: "a partir das 19h",
+  /**
+   * Hora de início. O texto do convite é derivado daqui (ver `HORARIO`), para
+   * o que está escrito e o que vai para a agenda nunca discordarem.
+   */
+  startHour: 19,
+  /**
+   * Quanto tempo o evento ocupa na agenda do convidado.
+   *
+   * Chute: a festa não tem hora para acabar, mas evento sem fim fica estranho
+   * no calendário e atrapalha quem usa a agenda para se organizar.
+   */
+  durationHours: 6,
   place: "Casa Open",
   /** Rua e número, quando houver. Vazio não aparece no convite. */
   address: "",
@@ -30,6 +41,59 @@ export const TOTAL_AGE = PARTY.hosts.reduce((sum, h) => sum + h.age, 0);
 
 /** "Bruno e Daniel" */
 export const HOST_NAMES = PARTY.hosts.map((h) => h.name).join(" e ");
+
+/** "a partir das 19h" — derivado, para não discordar do que vai na agenda. */
+export const HORARIO = `a partir das ${PARTY.startHour}h`;
+
+/** Endereço público do convite. */
+export const SITE = "https://convite-70-anos.vercel.app";
+
+/*
+ * Fuso da festa, fixo em UTC-3.
+ *
+ * O Brasil acabou com o horário de verão em 2019, então novembro de 2026 não
+ * tem ambiguidade. Se algum dia voltar, este número precisa voltar a ser
+ * calculado — um evento marcado uma hora errado é pior que nenhum.
+ */
+const UTC_OFFSET_HORAS = 3;
+
+function carimboUtc(d: Date): string {
+  const z = (n: number) => String(n).padStart(2, "0");
+  return (
+    `${d.getUTCFullYear()}${z(d.getUTCMonth() + 1)}${z(d.getUTCDate())}` +
+    `T${z(d.getUTCHours())}${z(d.getUTCMinutes())}00Z`
+  );
+}
+
+/**
+ * Link que abre o Google Agenda com o evento já preenchido.
+ *
+ * As datas vão em UTC (sufixo Z) de propósito: assim o evento cai na hora
+ * certa independentemente do fuso em que o convidado estiver — alguém abrindo
+ * de Portugal marca 19h de Brasília, não 19h de Lisboa.
+ */
+export function googleAgendaUrl(): string {
+  const [y, m, d] = PARTY.date.split("-").map(Number);
+  const inicio = new Date(Date.UTC(y, m - 1, d, PARTY.startHour + UTC_OFFSET_HORAS));
+  const fim = new Date(inicio.getTime() + PARTY.durationHours * 3_600_000);
+
+  const detalhes = [
+    `${TOTAL_AGE} anos somados: ${PARTY.hosts.map((h) => `${h.name} faz ${h.age}`).join(" e ")}.`,
+    PARTY.food && PARTY.drinks ? `${PARTY.food} e ${PARTY.drinks.toLowerCase()}.` : "",
+    `Convite: ${SITE}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `${TOTAL_AGE} anos — ${HOST_NAMES}`,
+    dates: `${carimboUtc(inicio)}/${carimboUtc(fim)}`,
+    details: detalhes,
+    location: [PARTY.place, PARTY.address].filter(Boolean).join(", "),
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
+}
 
 // ── Shows ──────────────────────────────────────────────
 

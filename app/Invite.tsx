@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import {
+  HORARIO,
   HOST_NAMES,
   MAX_KIDS,
   MAX_NOTE,
   PARTY,
   TOTAL_AGE,
   daysUntil,
+  googleAgendaUrl,
   longDate,
   randomShow,
   shortDate,
@@ -19,6 +21,21 @@ import {
 import { Show } from "./Show";
 import { Music } from "./Music";
 import { CheckerRule, Pour, Toast } from "./Art";
+
+/**
+ * Botão que abre o Google Agenda com o evento preenchido.
+ *
+ * É um link comum, e não um clique com JavaScript, para o convidado poder
+ * abrir numa aba nova ou copiar o endereço — e para funcionar mesmo se o
+ * script falhar.
+ */
+function BotaoAgenda() {
+  return (
+    <a className="btn-agenda" href={googleAgendaUrl()} target="_blank" rel="noreferrer">
+      <span aria-hidden="true">📅</span> adicionar à agenda do Google
+    </a>
+  );
+}
 
 /**
  * O convite. Um só, para todo mundo: o link é o mesmo e o show é sorteado a
@@ -235,6 +252,8 @@ export function Invite() {
             ) : (
               <p>Avisamos o {HOST_NAMES}. Se mudar de ideia, é só voltar neste link.</p>
             )}
+            {status === "yes" && <BotaoAgenda />}
+
             <button className="ghost-btn" onClick={() => setSent(false)}>
               mudar minha resposta
             </button>
@@ -397,11 +416,11 @@ export function Invite() {
           </div>
           {/* Linha própria: junto da data, o horário quebrava deixando o
               "·" órfão no começo da segunda linha. */}
-          {PARTY.time && (
+          {HORARIO && (
             <div>
               <dt>horário</dt>
               <dd>
-                <strong>{PARTY.time}</strong>
+                <strong>{HORARIO}</strong>
               </dd>
             </div>
           )}
@@ -445,6 +464,8 @@ export function Invite() {
             </dd>
           </div>
         </dl>
+
+        <BotaoAgenda />
 
         <Toast className="festa-art" />
 
